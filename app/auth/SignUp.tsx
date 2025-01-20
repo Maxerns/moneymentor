@@ -10,13 +10,8 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase/config";
-
-export type RootStackParamList = {
-  Landing: undefined;
-  SignUp: undefined;
-  Login: undefined;
-};
+import { auth } from "../../firebase/config";
+import { RootStackParamList } from "../../.expo/types/types";
 
 export default function SignUp() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -28,7 +23,7 @@ export default function SignUp() {
   const handleSignUp = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      navigation.navigate("Login");
+      navigation.navigate('auth/Login');
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message);
@@ -41,7 +36,7 @@ export default function SignUp() {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/images/MoneyMentorLogoGradient.png")}
+        source={require("../../assets/images/MoneyMentorLogoGradient.png")}
         style={styles.logo}
       />
 
@@ -105,7 +100,7 @@ export default function SignUp() {
         <Text style={styles.dividerText}>Already have an account?</Text>
         <TouchableOpacity
           style={styles.signInButton}
-          onPress={() => navigation.navigate("Login")}
+          onPress={() => navigation.navigate("auth/Login")}
         >
           <Text style={styles.signInText}>Sign In</Text>
         </TouchableOpacity>

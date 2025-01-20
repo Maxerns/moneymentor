@@ -1,20 +1,19 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../../.expo/types/types';
 
 
-type RootStackParamList = {
-  SignUp: undefined;
-  
-};
 
 export default function Landing() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  console.log(navigation.getState().routeNames); // Logs all valid routes
+
 
   return (
     <View style={styles.container}>
       
-      <Image source={require('../assets/images/MoneyMentorLogoGradient.png')} style={styles.logo} />
+      <Image source={require('../../assets/images/MoneyMentorLogoGradient.png')} style={styles.logo} />
 
       <Text style={styles.title}>Empower Your Wallet, Master Your Future</Text>
 
@@ -22,7 +21,7 @@ export default function Landing() {
         MoneyMentor simplifies money management with interactive tools, personalized advice, and lessons for all. From budgeting to saving, we help you build financial confidence and achieve your goals. Start mastering your money today!
       </Text>
 
-      <TouchableOpacity style={styles.buttonPrimary} onPress={() => navigation.navigate('SignUp')}>
+      <TouchableOpacity style={styles.buttonPrimary} onPress={() => navigation.navigate('auth/SignUp', )}>
         <Text style={styles.buttonStartText}>Get Started</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.buttonSecondary}>
@@ -31,6 +30,8 @@ export default function Landing() {
 
       <Text style={styles.loginText}>Already have an account? <Text style={styles.loginLink}>Login</Text></Text>
     </View>
+
+    
   );
 }
 

@@ -10,14 +10,7 @@ import {
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-
-export type RootStackParamList = {
-  Dashboard: undefined;
-  Tools: undefined;
-  Analysis: undefined;
-  Learning: undefined;
-  FinancialTermGlossary: undefined;
-};
+import { RootStackParamList } from "../../.expo/types/types";
 
 export default function Learning() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -29,7 +22,7 @@ export default function Learning() {
           <Ionicons name="person-circle-outline" size={36} color="#344950" />
         </TouchableOpacity>
         <Image
-          source={require("../assets/images/MoneyMentorLogoGradient.png")}
+          source={require("../../assets/images/MoneyMentorLogoGradient.png")}
           style={styles.logo}
         />
         <TouchableOpacity>
@@ -84,7 +77,7 @@ export default function Learning() {
               size={20}
               color="#344950"
               opacity={0.7}
-              onPress={() => navigation.navigate("FinancialTermGlossary")}
+              onPress={() => navigation.navigate("screens/FinancialTermGlossary")}
             />
           </View>
         </View>
@@ -109,7 +102,7 @@ export default function Learning() {
           <Ionicons
             name="home-outline"
             style={styles.navBarIcon}
-            onPress={() => navigation.navigate("Dashboard")}
+            onPress={() => navigation.navigate("screens/Dashboard")}
           />
           <Text style={styles.navText}>Dashboard</Text>
         </TouchableOpacity>
