@@ -11,15 +11,7 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-
-export type RootStackParamList = {
-  Dashboard: undefined;
-  Tools: undefined;
-  Analysis: undefined;
-  Learning: undefined;
-  FinancialTermGlossary: undefined;
-  TaxEstimatorTool: undefined;
-};
+import { RootStackParamList } from "../../.expo/types/types";
 
 export default function TaxEstimatorTool() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -51,7 +43,7 @@ export default function TaxEstimatorTool() {
             <Ionicons name="person-circle-outline" size={36} color="#344950" />
           </TouchableOpacity>
           <Image
-            source={require("../assets/images/MoneyMentorLogoGradient.png")}
+            source={require("../../assets/images/MoneyMentorLogoGradient.png")}
             style={styles.logo}
           />
           <TouchableOpacity>
@@ -127,7 +119,7 @@ export default function TaxEstimatorTool() {
           <Ionicons
             name="home-outline"
             style={styles.navBarIcon}
-            onPress={() => navigation.navigate("Dashboard")}
+            onPress={() => navigation.navigate("screens/Dashboard")}
           />
           <Text style={styles.navText}>Dashboard</Text>
         </TouchableOpacity>
@@ -135,7 +127,7 @@ export default function TaxEstimatorTool() {
           <Ionicons name="construct-outline" style={styles.navBarIcon} />
           <Text
             style={styles.navText}
-            onPress={() => navigation.navigate("TaxEstimatorTool")}
+            onPress={() => navigation.navigate("screens/TaxEstimatorTool")}
           >
             Tools
           </Text>
@@ -148,7 +140,7 @@ export default function TaxEstimatorTool() {
           <Ionicons
             name="school-outline"
             style={styles.navBarIcon}
-            onPress={() => navigation.navigate("Learning")}
+            onPress={() => navigation.navigate("screens/Learning")}
           />
           <Text style={styles.navText}>Learning</Text>
         </TouchableOpacity>

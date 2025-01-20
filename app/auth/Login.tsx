@@ -10,14 +10,9 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase/config";
+import { auth } from "../../firebase/config";
+import { RootStackParamList } from "../../.expo/types/types";
 
-export type RootStackParamList = {
-  Landing: undefined;
-  SignUp: undefined;
-  Login: undefined;
-  Dashboard: undefined;
-};
 
 export default function Login() {
   const [secureTextEntry, setSecureTextEntry] = useState(true);
@@ -33,7 +28,7 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate("Dashboard");
+      navigation.navigate("screens/Dashboard");
     } catch (error) {
       setError("Invalid email or password. Please try again.");
     }
@@ -44,7 +39,7 @@ export default function Login() {
       <TouchableOpacity style={styles.backButton}>
         <Text
           style={styles.backText}
-          onPress={() => navigation.navigate("SignUp")}
+          onPress={() => navigation.navigate("auth/SignUp")}
         >
           {"<"}
         </Text>
