@@ -9,20 +9,35 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/config";
 
 export type RootStackParamList = {
   Landing: undefined;
   SignUp: undefined;
   Login: undefined;
+  Dashboard: undefined;
 };
 
 export default function Login() {
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [isTouchIDEnabled, setIsTouchIDEnabled] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const toggleTouchID = () =>
     setIsTouchIDEnabled((previousState) => !previousState);
+
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigation.navigate("Dashboard");
+    } catch (error) {
+      setError("Invalid email or password. Please try again.");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -42,6 +57,10 @@ export default function Login() {
         placeholder="Email address"
         placeholderTextColor="#BDBDBD"
         keyboardType="email-address"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        onSubmitEditing={() => handleLogin()}
       />
 
       <View style={styles.passwordContainer}>
@@ -49,7 +68,10 @@ export default function Login() {
           style={styles.passwordInput}
           placeholder="Password"
           placeholderTextColor="#BDBDBD"
-          secureTextEntry
+          secureTextEntry={secureTextEntry}
+          value={password}
+          onChangeText={setPassword}
+          onSubmitEditing={() => handleLogin()}
         />
         <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
           <Icon
@@ -60,6 +82,8 @@ export default function Login() {
           />
         </TouchableOpacity>
       </View>
+
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
       <TouchableOpacity>
         <Text style={styles.forgotPassword}>
@@ -77,7 +101,7 @@ export default function Login() {
         />
       </View>
 
-      <TouchableOpacity style={styles.signInButton}>
+      <TouchableOpacity style={styles.signInButton} onPress={handleLogin}>
         <Text style={styles.signInText}>Sign in</Text>
       </TouchableOpacity>
 
@@ -173,6 +197,16 @@ const styles = StyleSheet.create({
   },
   signInButton: {
     width: "100%",
+    backgroundColor: "#00ADB5",
+    paddingVertical: 15,
+    paddingHorizontal: 50,
+    borderRadius: 15,
+    alignItems: "center",
+    shadowColor: "#000000",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
   },
   signInText: {
     fontSize: 16,
@@ -200,4 +234,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   icon: {},
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+  },
 });
