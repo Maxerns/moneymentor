@@ -1,18 +1,42 @@
-import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  TextInput,
+} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/config";
 
 export type RootStackParamList = {
   Landing: undefined;
-
   SignUp: undefined;
-
   Login: undefined;
 };
 
 export default function SignUp() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [showEmailSignUp, setShowEmailSignUp] = useState(false);
+
+  const handleSignUp = async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      navigation.navigate("Login");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unknown error occurred");
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -21,24 +45,61 @@ export default function SignUp() {
         style={styles.logo}
       />
 
-      <TouchableOpacity style={styles.socialButton}>
-        <Icon name="facebook" size={20} color="#000000" style={styles.icon} />
-        <Text style={styles.socialText}>Continue with Facebook</Text>
-      </TouchableOpacity>
+      {!showEmailSignUp && (
+        <>
+          <TouchableOpacity style={styles.socialButton}>
+            <Icon
+              name="facebook"
+              size={20}
+              color="#000000"
+              style={styles.icon}
+            />
+            <Text style={styles.socialText}>Continue with Facebook</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity style={styles.socialButton}>
-        <Icon name="google" size={20} color="#000000" style={styles.icon} />
-        <Text style={styles.socialText}>Continue with Google</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.socialButton}>
+            <Icon name="google" size={20} color="#000000" style={styles.icon} />
+            <Text style={styles.socialText}>Continue with Google</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity style={styles.socialButton}>
-        <Icon name="apple" size={20} color="#000000" style={styles.icon} />
-        <Text style={styles.socialText}>Continue with Apple</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.socialButton}>
+            <Icon name="apple" size={20} color="#000000" style={styles.icon} />
+            <Text style={styles.socialText}>Continue with Apple</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity style={styles.emailButton}>
-        <Text style={styles.emailText}>Sign up with email</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.emailButton}
+            onPress={() => setShowEmailSignUp(true)}
+          >
+            <Text style={styles.emailText}>Sign up with email</Text>
+          </TouchableOpacity>
+        </>
+      )}
+
+      {showEmailSignUp && (
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          <TouchableOpacity style={styles.emailButton} onPress={handleSignUp}>
+            <Text style={styles.emailText}>Sign up with email</Text>
+          </TouchableOpacity>
+        </>
+      )}
 
       <View style={styles.divider}>
         <Text style={styles.dividerText}>Already have an account?</Text>
@@ -86,6 +147,16 @@ const styles = StyleSheet.create({
   socialText: {
     fontSize: 16,
     color: "#4F4F4F",
+  },
+  input: {
+    width: "100%",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    marginBottom: 15,
   },
   emailButton: {
     backgroundColor: "#00ADB5",
@@ -135,5 +206,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#00c6ff",
     fontWeight: "600",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
   },
 });

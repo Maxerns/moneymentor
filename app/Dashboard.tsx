@@ -8,6 +8,7 @@ export type RootStackParamList = {
   Tools: undefined;
   Analysis: undefined;
   Learning: undefined;
+  TaxEstimatorTool: undefined;
 };
 
 export default function DashboardPage() {
@@ -66,7 +67,7 @@ export default function DashboardPage() {
           <Text style={styles.navText}>Dashboard</Text>
         </TouchableOpacity>
         <TouchableOpacity>
-          <Ionicons name="construct-outline" style={styles.navBarIcon} />
+          <Ionicons name="construct-outline" style={styles.navBarIcon} onPress={() => navigation.navigate("TaxEstimatorTool")}/>
           <Text style={styles.navText}>Tools</Text>
         </TouchableOpacity>
         <TouchableOpacity>

@@ -17,6 +17,7 @@ export type RootStackParamList = {
   Analysis: undefined;
   Learning: undefined;
   FinancialTermGlossary: undefined;
+  TaxEstimatorTool: undefined;
 };
 
 export default function FinancialTermGlossary() {
@@ -120,7 +121,8 @@ export default function FinancialTermGlossary() {
         </TouchableOpacity>
         <TouchableOpacity>
           <Ionicons name="construct-outline" style={styles.navBarIcon} />
-          <Text style={styles.navText}>Tools</Text>
+          <Text style={styles.navText}
+          onPress={() => navigation.navigate("TaxEstimatorTool")}>Tools</Text>
         </TouchableOpacity>
         <TouchableOpacity>
           <Ionicons name="analytics-outline" style={styles.navBarIcon} />
