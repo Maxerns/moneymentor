@@ -7,8 +7,6 @@ import { RootStackParamList } from '../../.expo/types/types';
 
 export default function Landing() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  console.log(navigation.getState().routeNames); // Logs all valid routes
-
 
   return (
     <View style={styles.container}>
