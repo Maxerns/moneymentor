@@ -5,7 +5,6 @@ import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../.expo/types/types";
 
 export default function DashboardPage() {
-
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   return (
@@ -13,7 +12,7 @@ export default function DashboardPage() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity>
-          <Ionicons name="person-circle-outline" size={36} color="#344950" />
+          <Ionicons name="person-circle-outline" size={36} color="#344950" onPress={() => navigation.navigate('screens/Profile')} />
         </TouchableOpacity>
         <Image
           source={require("../../assets/images/MoneyMentorLogoGradient.png")}
@@ -60,7 +59,11 @@ export default function DashboardPage() {
           <Text style={styles.navText}>Dashboard</Text>
         </TouchableOpacity>
         <TouchableOpacity>
-          <Ionicons name="construct-outline" style={styles.navBarIcon} onPress={() => navigation.navigate("screens/TaxEstimatorTool")}/>
+          <Ionicons
+            name="construct-outline"
+            style={styles.navBarIcon}
+            onPress={() => navigation.navigate("screens/TaxEstimatorTool")}
+          />
           <Text style={styles.navText}>Tools</Text>
         </TouchableOpacity>
         <TouchableOpacity>
@@ -68,7 +71,11 @@ export default function DashboardPage() {
           <Text style={styles.navText}>Analysis</Text>
         </TouchableOpacity>
         <TouchableOpacity>
-          <Ionicons name="school-outline" style={styles.navBarIcon} onPress={() => navigation.navigate('screens/Learning')} />
+          <Ionicons
+            name="school-outline"
+            style={styles.navBarIcon}
+            onPress={() => navigation.navigate("screens/Learning")}
+          />
           <Text style={styles.navText}>Learning</Text>
         </TouchableOpacity>
       </View>

@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   navBar: {
     position: "absolute",
     bottom: 0,
-    width: "115%",
+    width: "100%",
     left: 0,
     right: 0,
     flexDirection: "row",

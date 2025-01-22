@@ -26,22 +26,50 @@ export default function FinancialTermGlossary() {
 
   const terms: { [key: string]: { term: string; definition: string }[] } = {
     A: [
-      { term: "Absolute Advantage", definition: "Absolute advantage is when a person, company, or country can produce more of a good or service with the same amount of resources (or produce the same amount using fewer resources) compared to others." },
-      { term: "Accounting Equation", definition: "The Accounting Equation is the foundation of double-entry bookkeeping and represents the relationship between a company's assets, liabilities, and equity." },
-      { term: "Acquisition", definition: "An acquisition is when one company purchases most or all of another company's shares or assets to take control of that company." },
-      { term: "Accounting Rate of Return (ARR)", definition: "The Accounting Rate of Return (ARR) is a financial metric used to evaluate the profitability of an investment. It measures the expected annual return as a percentage of the initial investment cost or average investment." },
+      {
+        term: "Absolute Advantage",
+        definition:
+          "Absolute advantage is when a person, company, or country can produce more of a good or service with the same amount of resources (or produce the same amount using fewer resources) compared to others.",
+      },
+      {
+        term: "Accounting Equation",
+        definition:
+          "The Accounting Equation is the foundation of double-entry bookkeeping and represents the relationship between a company's assets, liabilities, and equity.",
+      },
+      {
+        term: "Acquisition",
+        definition:
+          "An acquisition is when one company purchases most or all of another company's shares or assets to take control of that company.",
+      },
+      {
+        term: "Accounting Rate of Return (ARR)",
+        definition:
+          "The Accounting Rate of Return (ARR) is a financial metric used to evaluate the profitability of an investment. It measures the expected annual return as a percentage of the initial investment cost or average investment.",
+      },
     ],
     B: [
-      { term: "Balanced Scorecard", definition: "A balanced scorecard (BSC) is defined as a management system that provides feedback on both internal business processes and external outcomes to continuously improve strategic performance and results" },
-      { term: "Bond", definition: "Bonds are issued by governments and corporations when they want to raise money. By buying a bond, you're giving the issuer a loan, and they agree to pay you back the face value of the loan on a specific date, and to pay you periodic interest payments along the way, usually twice a year." },
-      { term: "Budget", definition: "A budget is a monthly or annual plan that documents your income, tracks your expenses and leaves room for financial goals." },
-      { term: "Bull Market", definition: "A bull market is a financial market in which prices are rising or are expected to rise." },
+      {
+        term: "Balanced Scorecard",
+        definition:
+          "A balanced scorecard (BSC) is defined as a management system that provides feedback on both internal business processes and external outcomes to continuously improve strategic performance and results",
+      },
+      {
+        term: "Bond",
+        definition:
+          "Bonds are issued by governments and corporations when they want to raise money. By buying a bond, you're giving the issuer a loan, and they agree to pay you back the face value of the loan on a specific date, and to pay you periodic interest payments along the way, usually twice a year.",
+      },
+      {
+        term: "Budget",
+        definition:
+          "A budget is a monthly or annual plan that documents your income, tracks your expenses and leaves room for financial goals.",
+      },
+      {
+        term: "Bull Market",
+        definition:
+          "A bull market is a financial market in which prices are rising or are expected to rise.",
+      },
     ],
-    C: [
-      { term: "Sample Term", definition: "Sample Definition" },
-
-    ],
-    // Add more letters and terms as needed
+    C: [{ term: "Sample Term", definition: "Sample Definition" }],
   };
 
   return (
@@ -112,9 +140,12 @@ export default function FinancialTermGlossary() {
           <Text style={styles.navText}>Dashboard</Text>
         </TouchableOpacity>
         <TouchableOpacity>
-          <Ionicons name="construct-outline" style={styles.navBarIcon} />
-          <Text style={styles.navText}
-          onPress={() => navigation.navigate("screens/TaxEstimatorTool")}>Tools</Text>
+          <Ionicons
+            name="construct-outline"
+            style={styles.navBarIcon}
+            onPress={() => navigation.navigate("screens/TaxEstimatorTool")}
+          />
+          <Text style={styles.navText}>Tools</Text>
         </TouchableOpacity>
         <TouchableOpacity>
           <Ionicons name="analytics-outline" style={styles.navBarIcon} />
