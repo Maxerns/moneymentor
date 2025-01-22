@@ -77,7 +77,9 @@ export default function Learning() {
               size={20}
               color="#344950"
               opacity={0.7}
-              onPress={() => navigation.navigate("screens/FinancialTermGlossary")}
+              onPress={() =>
+                navigation.navigate("screens/FinancialTermGlossary")
+              }
             />
           </View>
         </View>
@@ -107,7 +109,11 @@ export default function Learning() {
           <Text style={styles.navText}>Dashboard</Text>
         </TouchableOpacity>
         <TouchableOpacity>
-          <Ionicons name="construct-outline" style={styles.navBarIcon} />
+          <Ionicons
+            name="construct-outline"
+            style={styles.navBarIcon}
+            onPress={() => navigation.navigate("screens/TaxEstimatorTool")}
+          />
           <Text style={styles.navText}>Tools</Text>
         </TouchableOpacity>
         <TouchableOpacity>

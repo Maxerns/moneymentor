@@ -22,7 +22,7 @@ export default function Landing() {
       <TouchableOpacity style={styles.buttonPrimary} onPress={() => navigation.navigate('auth/SignUp', )}>
         <Text style={styles.buttonStartText}>Get Started</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonSecondary}>
+      <TouchableOpacity style={styles.buttonSecondary} onPress={() => navigation.navigate('screens/Dashboard', )}>
         <Text style={styles.buttonGuestText}>Explore as Guest</Text>
       </TouchableOpacity>
 
@@ -45,8 +45,8 @@ const styles = StyleSheet.create({
     width: 75,
     height: 75,
     position: 'absolute',
-    top: 10,
-    left: 10,
+    top: 50,
+    left: 20,
   },
   title: {
     fontSize: 38,

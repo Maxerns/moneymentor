@@ -9,6 +9,7 @@ import Dashboard from "../screens/Dashboard";
 import Learning from "../screens/Learning";
 import FinancialTermGlossary from "../screens/FinancialTermGlossary";
 import TaxEstimatorTool from "../screens/TaxEstimatorTool";
+import Profile from "../screens/Profile";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -29,6 +30,7 @@ const Navigator = () => {
           name="screens/TaxEstimatorTool"
           component={TaxEstimatorTool}
         />
+        <Stack.Screen name="screens/Profile" component={Profile} />
       </Stack.Navigator>
     </NavigationContainer>
   );
