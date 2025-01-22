@@ -9,10 +9,10 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { RootStackParamList } from "../../.expo/types/types";
-
 
 export default function Login() {
   const [secureTextEntry, setSecureTextEntry] = useState(true);
@@ -21,16 +21,44 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [resetError, setResetError] = useState("");
 
   const toggleTouchID = () =>
     setIsTouchIDEnabled((previousState) => !previousState);
 
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      if (!user.emailVerified) {
+        setError("Please verify your email before logging in.");
+        await signOut(auth);
+        return;
+      }
+      
       navigation.navigate("screens/Dashboard");
     } catch (error) {
       setError("Invalid email or password. Please try again.");
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!email) {
+      setResetError("Please enter your email address first");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert("Password reset email sent! Please check your inbox.");
+      setResetError("");
+    } catch (error) {
+      if (error instanceof Error) {
+        setResetError(error.message);
+      } else {
+        setResetError("Failed to send reset email");
+      }
     }
   };
 
@@ -80,11 +108,13 @@ export default function Login() {
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handlePasswordReset}>
         <Text style={styles.forgotPassword}>
           Forgot your password? <Text style={styles.linkText}>Click here</Text>
         </Text>
       </TouchableOpacity>
+
+      {resetError ? <Text style={styles.errorText}>{resetError}</Text> : null}
 
       <View style={styles.touchIDContainer}>
         <Text style={styles.touchIDText}>Unlock with Touch ID?</Text>

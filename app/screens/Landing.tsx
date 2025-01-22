@@ -26,7 +26,7 @@ export default function Landing() {
         <Text style={styles.buttonGuestText}>Explore as Guest</Text>
       </TouchableOpacity>
 
-      <Text style={styles.loginText}>Already have an account? <Text style={styles.loginLink}>Login</Text></Text>
+      <Text style={styles.loginText}>Already have an account? <Text style={styles.loginLink} onPress={() => navigation.navigate('auth/Login')}>Login</Text></Text>
     </View>
 
     

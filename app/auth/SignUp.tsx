@@ -6,10 +6,15 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { 
+  createUserWithEmailAndPassword, 
+  sendEmailVerification,
+  signOut 
+} from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { RootStackParamList } from "../../.expo/types/types";
 
@@ -19,19 +24,72 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showEmailSignUp, setShowEmailSignUp] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+
 
   const handleSignUp = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigation.navigate('auth/Login');
+      setLoading(true);
+      setError("");
+
+      // Create user account
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Send verification email
+      await sendEmailVerification(user);
+
+      // Sign out until email is verified
+      await signOut(auth);
+
+      setVerificationSent(true);
+      setShowEmailSignUp(false);
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message);
       } else {
         setError("An unknown error occurred");
       }
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color="#00ADB5" />
+      </View>
+    );
+  }
+
+  if (verificationSent) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <Icon name="envelope-o" size={50} color="#00ADB5" />
+        <Text style={styles.verificationTitle}>Verify your email</Text>
+        <Text style={styles.verificationText}>
+          We've sent a verification link to:
+        </Text>
+        <Text style={styles.mainEmailText}>{email}</Text>
+        <Text style={styles.verificationInstructions}>
+          Please check your email and click the verification link to complete
+          your registration.
+        </Text>
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={() => navigation.navigate("auth/Login")}
+        >
+          <Text style={styles.loginButtonText}>Go to Login</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -66,7 +124,7 @@ export default function SignUp() {
             style={styles.emailButton}
             onPress={() => setShowEmailSignUp(true)}
           >
-            <Text style={styles.emailText}>Sign up with email</Text>
+            <Text style={styles.mainEmailText}>Sign up with email</Text>
           </TouchableOpacity>
         </>
       )}
@@ -91,7 +149,7 @@ export default function SignUp() {
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
           <TouchableOpacity style={styles.emailButton} onPress={handleSignUp}>
-            <Text style={styles.emailText}>Sign up with email</Text>
+            <Text style={styles.mainEmailText}>Sign up with email</Text>
           </TouchableOpacity>
         </>
       )}
@@ -167,7 +225,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
   },
-  emailText: {
+  mainEmailText: {
     fontSize: 16,
     color: "#FFFFFF",
     fontWeight: "600",
@@ -205,5 +263,47 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     marginBottom: 10,
+  },
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  verificationTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#00ADB5',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  verificationText: {
+    fontSize: 16,
+    color: '#4F4F4F',
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  emailText: {
+    fontSize: 16,
+    color: '#00ADB5',
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  verificationInstructions: {
+    fontSize: 14,
+    color: '#4F4F4F',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  loginButton: {
+    backgroundColor: '#00ADB5',
+    paddingVertical: 15,
+    paddingHorizontal: 50,
+    borderRadius: 15,
+    marginTop: 20,
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
