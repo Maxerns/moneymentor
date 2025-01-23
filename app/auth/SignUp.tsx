@@ -10,10 +10,10 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { 
-  createUserWithEmailAndPassword, 
+import {
+  createUserWithEmailAndPassword,
   sendEmailVerification,
-  signOut 
+  signOut,
 } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { RootStackParamList } from "../../.expo/types/types";
@@ -26,7 +26,6 @@ export default function SignUp() {
   const [showEmailSignUp, setShowEmailSignUp] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
   const [loading, setLoading] = useState(false);
-
 
   const handleSignUp = async () => {
     try {
@@ -71,12 +70,19 @@ export default function SignUp() {
   if (verificationSent) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <Icon name="envelope-o" size={50} color="#00ADB5" />
+        <Image
+          source={require("../../assets/images/verification steps.png")}
+          style={styles.stepsHeader}
+        />
+        <Image
+          source={require("../../assets/images/illustration.png")}
+          style={styles.verificationLogo}
+        />
         <Text style={styles.verificationTitle}>Verify your email</Text>
         <Text style={styles.verificationText}>
           We've sent a verification link to:
         </Text>
-        <Text style={styles.mainEmailText}>{email}</Text>
+        <Text style={styles.secondaryEmailText}>{email}</Text>
         <Text style={styles.verificationInstructions}>
           Please check your email and click the verification link to complete
           your registration.
@@ -230,6 +236,11 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "600",
   },
+  secondaryEmailText: {
+    fontSize: 16,
+    color: "#000000",
+    fontWeight: "600",
+  },
   divider: {
     alignItems: "center",
     marginTop: 20,
@@ -265,45 +276,55 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   verificationTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#00ADB5',
+    fontWeight: "bold",
+    color: "#00ADB5",
     marginTop: 20,
     marginBottom: 10,
   },
   verificationText: {
     fontSize: 16,
-    color: '#4F4F4F',
-    textAlign: 'center',
+    color: "#4F4F4F",
+    fontWeight: "300",
+    textAlign: "center",
     marginBottom: 5,
-  },
-  emailText: {
-    fontSize: 16,
-    color: '#00ADB5',
-    fontWeight: 'bold',
-    marginBottom: 20,
+    margin: 10,
   },
   verificationInstructions: {
     fontSize: 14,
-    color: '#4F4F4F',
-    textAlign: 'center',
+    color: "#4F4F4F",
+    fontWeight: "300",
+    textAlign: "center",
     marginBottom: 30,
+    padding: 10,
+    margin: 5,
   },
   loginButton: {
-    backgroundColor: '#00ADB5',
+    backgroundColor: "#00ADB5",
     paddingVertical: 15,
     paddingHorizontal: 50,
     borderRadius: 15,
     marginTop: 20,
   },
   loginButtonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+  },
+  verificationLogo: {
+    width: 250,
+    height: 250,
+    resizeMode: "contain",
+  },
+  stepsHeader: {
+    width: 200,
+    height: 100,
+    marginBottom: 0,
+    resizeMode: "contain",
   },
 });
