@@ -13,9 +13,10 @@ import { useNavigation, NavigationProp } from "@react-navigation/native";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
-  deleteUser,
   fetchSignInMethodsForEmail,
+  updatePassword,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { RootStackParamList } from "../../.expo/types/types";
@@ -91,16 +92,18 @@ export default function SignUp() {
     try {
       setLoading(true);
 
-      // First sign in with temporary password
-      await signInWithEmailAndPassword(auth, email, "temporary123");
+      // Sign in with temporary password
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        "temporary123"
+      );
 
-      // Delete the temporary account
-      if (auth.currentUser) {
-        await deleteUser(auth.currentUser);
-      }
+      // Update password
+      await updatePassword(userCredential.user, password);
 
-      // Create new account with permanent password
-      await createUserWithEmailAndPassword(auth, email, password);
+      // Sign out and redirect to login
+      await signOut(auth);
       navigation.navigate("auth/Login");
     } catch (error: any) {
       setError(error.message);
