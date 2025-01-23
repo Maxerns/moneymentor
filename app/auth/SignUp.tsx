@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -13,7 +13,9 @@ import { useNavigation, NavigationProp } from "@react-navigation/native";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
-  signOut,
+  deleteUser,
+  fetchSignInMethodsForEmail,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { RootStackParamList } from "../../.expo/types/types";
@@ -22,38 +24,86 @@ export default function SignUp() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [showEmailSignUp, setShowEmailSignUp] = useState(false);
+  const [showPasswordCreation, setShowPasswordCreation] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
-  const handleSignUp = async () => {
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        // Force refresh to get latest verification status
+        await user.reload();
+        if (user.emailVerified) {
+          setIsEmailVerified(true);
+          setShowPasswordCreation(true);
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleEmailContinue = async () => {
+    if (!email || !email.includes("@")) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
     try {
       setLoading(true);
-      setError("");
+      // Check if email already exists
+      const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+      if (signInMethods.length > 0) {
+        setError("An account with this email already exists");
+        return;
+      }
 
-      // Create user account
+      // If email is valid and doesn't exist, proceed with verification
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
-        password
+        "temporary123"
       );
-      const user = userCredential.user;
-
-      // Send verification email
-      await sendEmailVerification(user);
-
-      // Sign out until email is verified
-      await signOut(auth);
-
+      await sendEmailVerification(userCredential.user);
       setVerificationSent(true);
-      setShowEmailSignUp(false);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError("An unknown error occurred");
+      setError("");
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreatePassword = async () => {
+    if (password !== confirmPassword) {
+      setError("Passwords don't match");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // First sign in with temporary password
+      await signInWithEmailAndPassword(auth, email, "temporary123");
+
+      // Delete the temporary account
+      if (auth.currentUser) {
+        await deleteUser(auth.currentUser);
       }
+
+      // Create new account with permanent password
+      await createUserWithEmailAndPassword(auth, email, password);
+      navigation.navigate("auth/Login");
+    } catch (error: any) {
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -67,7 +117,7 @@ export default function SignUp() {
     );
   }
 
-  if (verificationSent) {
+  if (verificationSent && !isEmailVerified) {
     return (
       <View style={[styles.container, styles.centered]}>
         <Image
@@ -84,19 +134,80 @@ export default function SignUp() {
         </Text>
         <Text style={styles.secondaryEmailText}>{email}</Text>
         <Text style={styles.verificationInstructions}>
-          Please check your email and click the verification link to complete
-          your registration.
+          Please check your email and click the verification link to continue
+          setting up your account.
         </Text>
         <TouchableOpacity
           style={styles.loginButton}
-          onPress={() => navigation.navigate("auth/Login")}
+          onPress={async () => {
+            if (auth.currentUser) {
+              await auth.currentUser.reload();
+              setIsEmailVerified(auth.currentUser.emailVerified);
+              if (auth.currentUser.emailVerified) {
+                setShowPasswordCreation(true);
+              }
+            }
+          }}
         >
-          <Text style={styles.loginButtonText}>Go to Login</Text>
+          <Text style={styles.loginButtonText}>I've verified my email</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
+  if (showPasswordCreation) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.header}>Create your password</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+        />
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        <TouchableOpacity
+          style={styles.emailButton}
+          onPress={handleCreatePassword}
+        >
+          <Text style={styles.mainEmailText}>Complete Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (showEmailSignUp) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.header}>What's your email?</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        <TouchableOpacity
+          style={styles.emailButton}
+          onPress={handleEmailContinue}
+        >
+          <Text style={styles.mainEmailText}>Continue</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Initial view with social buttons
   return (
     <View style={styles.container}>
       <Image
@@ -104,61 +215,27 @@ export default function SignUp() {
         style={styles.logo}
       />
 
-      {!showEmailSignUp && (
-        <>
-          <TouchableOpacity style={styles.socialButton}>
-            <Icon
-              name="facebook"
-              size={20}
-              color="#000000"
-              style={styles.icon}
-            />
-            <Text style={styles.socialText}>Continue with Facebook</Text>
-          </TouchableOpacity>
+      <TouchableOpacity style={styles.socialButton}>
+        <Icon name="facebook" size={20} color="#000000" style={styles.icon} />
+        <Text style={styles.socialText}>Continue with Facebook</Text>
+      </TouchableOpacity>
 
-          <TouchableOpacity style={styles.socialButton}>
-            <Icon name="google" size={20} color="#000000" style={styles.icon} />
-            <Text style={styles.socialText}>Continue with Google</Text>
-          </TouchableOpacity>
+      <TouchableOpacity style={styles.socialButton}>
+        <Icon name="google" size={20} color="#000000" style={styles.icon} />
+        <Text style={styles.socialText}>Continue with Google</Text>
+      </TouchableOpacity>
 
-          <TouchableOpacity style={styles.socialButton}>
-            <Icon name="apple" size={20} color="#000000" style={styles.icon} />
-            <Text style={styles.socialText}>Continue with Apple</Text>
-          </TouchableOpacity>
+      <TouchableOpacity style={styles.socialButton}>
+        <Icon name="apple" size={20} color="#000000" style={styles.icon} />
+        <Text style={styles.socialText}>Continue with Apple</Text>
+      </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.emailButton}
-            onPress={() => setShowEmailSignUp(true)}
-          >
-            <Text style={styles.mainEmailText}>Sign up with email</Text>
-          </TouchableOpacity>
-        </>
-      )}
-
-      {showEmailSignUp && (
-        <>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-          <TouchableOpacity style={styles.emailButton} onPress={handleSignUp}>
-            <Text style={styles.mainEmailText}>Sign up with email</Text>
-          </TouchableOpacity>
-        </>
-      )}
+      <TouchableOpacity
+        style={styles.emailButton}
+        onPress={() => setShowEmailSignUp(true)}
+      >
+        <Text style={styles.mainEmailText}>Sign up with email</Text>
+      </TouchableOpacity>
 
       <View style={styles.divider}>
         <Text style={styles.dividerText}>Already have an account?</Text>
@@ -180,6 +257,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#F7F9FC",
     paddingHorizontal: 20,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#344950",
+    marginBottom: 20,
   },
   logo: {
     width: 75,
