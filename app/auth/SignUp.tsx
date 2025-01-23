@@ -7,6 +7,7 @@ import {
   Image,
   TextInput,
   ActivityIndicator,
+  Switch,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
@@ -32,6 +33,8 @@ export default function SignUp() {
   const [verificationSent, setVerificationSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [isTouchIDEnabled, setIsTouchIDEnabled] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -47,6 +50,9 @@ export default function SignUp() {
 
     return () => unsubscribe();
   }, []);
+
+  const toggleTouchID = () =>
+    setIsTouchIDEnabled((previousState) => !previousState);
 
   const handleEmailContinue = async () => {
     if (!email || !email.includes("@")) {
@@ -161,28 +167,77 @@ export default function SignUp() {
   if (showPasswordCreation) {
     return (
       <View style={styles.container}>
+        <Image
+          source={require("../../assets/images/verification steps.png")}
+          style={styles.stepsHeader}
+        />
         <Text style={styles.header}>Create your password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-        />
+        <Text style={styles.passwordSubText}>
+          The password must be 8 characters, including 1 uppercase letter, 1
+          number and 1 special character.
+        </Text>
+
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Enter password"
+            secureTextEntry={secureTextEntry}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity
+            onPress={() => setSecureTextEntry(!secureTextEntry)}
+          >
+            <Icon
+              style={styles.eyeIcon}
+              name={secureTextEntry ? "eye-slash" : "eye"}
+              size={20}
+              color="#BDBDBD"
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Confirm password"
+            secureTextEntry={secureTextEntry}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+          <TouchableOpacity
+            onPress={() => setSecureTextEntry(!secureTextEntry)}
+          >
+            <Icon
+              style={styles.eyeIcon}
+              name={secureTextEntry ? "eye-slash" : "eye"}
+              size={20}
+              color="#BDBDBD"
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.touchIDContainer}>
+          <Text style={styles.touchIDText}>Unlock with Touch ID?</Text>
+          <Switch
+            value={isTouchIDEnabled}
+            onValueChange={toggleTouchID}
+            thumbColor={isTouchIDEnabled ? "#00c6ff" : "#f4f3f4"}
+            trackColor={{ false: "#E0E0E0", true: "#B3E5FC" }}
+          />
+        </View>
+
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         <TouchableOpacity
           style={styles.emailButton}
           onPress={handleCreatePassword}
         >
-          <Text style={styles.mainEmailText}>Complete Sign Up</Text>
+          <Text style={styles.mainEmailText}>Continue</Text>
         </TouchableOpacity>
+        <Text style={styles.subText}>
+          By registering you accept our Terms & Conditions and Privacy Policy.
+          Your data will be security encrypted with TLS
+        </Text>
       </View>
     );
   }
@@ -190,6 +245,10 @@ export default function SignUp() {
   if (showEmailSignUp) {
     return (
       <View style={styles.container}>
+        <Image
+          source={require("../../assets/images/verification steps.png")}
+          style={styles.stepsHeader}
+        />
         <Text style={styles.header}>What's your email?</Text>
         <TextInput
           style={styles.input}
@@ -199,13 +258,32 @@ export default function SignUp() {
           keyboardType="email-address"
           autoCapitalize="none"
         />
+
+        <View style={styles.divider}>
+          <TouchableOpacity>
+            <Text style={styles.loginText}>
+              Have an account?{" "}
+              <Text
+                style={styles.loginLink}
+                onPress={() => navigation.navigate("auth/Login")}
+              >
+                Log in here
+              </Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         <TouchableOpacity
           style={styles.emailButton}
           onPress={handleEmailContinue}
         >
-          <Text style={styles.mainEmailText}>Continue</Text>
+          <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
+        <Text style={styles.subText}>
+          By registering you accept our Terms & Conditions and Privacy Policy.
+          Your data will be security encrypted with TLS
+        </Text>
       </View>
     );
   }
@@ -261,11 +339,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#F7F9FC",
     paddingHorizontal: 20,
   },
+  passwordContainer: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    marginBottom: 10,
+  },
   header: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#344950",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   logo: {
     width: 75,
@@ -293,15 +381,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#4F4F4F",
   },
-  input: {
-    width: "100%",
+  passwordInput: {
+    flex: 1,
     paddingVertical: 15,
     paddingHorizontal: 10,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-    marginBottom: 15,
+    color: "#4F4F4F",
   },
   emailButton: {
     backgroundColor: "#00ADB5",
@@ -309,6 +393,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
     borderRadius: 15,
     marginBottom: 15,
+    marginTop: 100,
     width: "100%",
     alignItems: "center",
     shadowColor: "#000000",
@@ -322,6 +407,11 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "600",
   },
+  continueButtonText: {
+    fontSize: 16,
+    color: "#FFFFFF",
+    fontWeight: "600",
+  },
   secondaryEmailText: {
     fontSize: 16,
     color: "#000000",
@@ -329,7 +419,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 0,
   },
   dividerText: {
     fontSize: 14,
@@ -356,6 +446,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#00c6ff",
     fontWeight: "600",
+  },
+  loginText: {
+    fontSize: 14,
+    color: "#707070",
+    marginBottom: 10,
+  },
+  loginLink: {
+    color: "#00ADB5",
+    fontWeight: "bold",
+    marginBottom: 10,
   },
   errorText: {
     color: "red",
@@ -410,7 +510,38 @@ const styles = StyleSheet.create({
   stepsHeader: {
     width: 200,
     height: 100,
-    marginBottom: 0,
+    marginBottom: 30,
     resizeMode: "contain",
+  },
+  subText: {
+    fontSize: 14,
+    color: "#4F4F4F",
+    fontWeight: "300",
+    textAlign: "center",
+    marginBottom: 30,
+    padding: 10,
+    margin: 5,
+  },
+  passwordSubText: {
+    fontSize: 14,
+    color: "#4F4F4F",
+    fontWeight: "300",
+    textAlign: "center",
+    marginBottom: 30,
+  },
+  eyeIcon: {
+    paddingHorizontal: 10,
+    fontSize: 20,
+  },
+  touchIDContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 30,
+  },
+  touchIDText: {
+    fontSize: 16,
+    color: "#4F4F4F",
   },
 });
