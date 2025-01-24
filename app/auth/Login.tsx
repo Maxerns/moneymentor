@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Switch,
+  Image,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
@@ -22,21 +23,27 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [resetError, setResetError] = useState("");
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+  
 
   const toggleTouchID = () =>
     setIsTouchIDEnabled((previousState) => !previousState);
 
   const handleLogin = async () => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
-      
+
       if (!user.emailVerified) {
         setError("Please verify your email before logging in.");
         await signOut(auth);
         return;
       }
-      
+
       navigation.navigate("screens/Dashboard");
     } catch (error) {
       setError("Invalid email or password. Please try again.");
@@ -53,6 +60,7 @@ export default function Login() {
       await sendPasswordResetEmail(auth, email);
       alert("Password reset email sent! Please check your inbox.");
       setResetError("");
+      setShowPasswordReset(false);
     } catch (error) {
       if (error instanceof Error) {
         setResetError(error.message);
@@ -61,6 +69,72 @@ export default function Login() {
       }
     }
   };
+
+  if (showPasswordReset) {
+    return (
+      <View style={styles.container}>
+        <TouchableOpacity style={styles.backButton}>
+          <Text
+            style={styles.backText}
+            onPress={() => setShowPasswordReset(false)}
+          >
+            {"<"}
+          </Text>
+        </TouchableOpacity>
+        <Image
+          source={require("../../assets/images/verification steps.png")}
+          style={styles.stepsHeader}
+        />
+        <Text style={styles.header}>Password Reset</Text>
+        <Text style={styles.resetSubText}>
+          Please enter your registered email address to reset your password
+        </Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+
+        {resetError ? <Text style={styles.errorText}>{resetError}</Text> : null}
+
+        <TouchableOpacity
+          style={styles.emailButton}
+          onPress={handlePasswordReset}
+        >
+          <Text style={styles.continueButtonText}>Send Reset Link</Text>
+        </TouchableOpacity>
+        <Text style={styles.subText}>
+          By registering you accept our Terms & Conditions and Privacy Policy.
+          Your data will be security encrypted with TLS
+        </Text>
+
+        <View style={styles.dividerContainer}>
+          <Text style={styles.divider}>or continue with</Text>
+        </View>
+
+        <View style={styles.socialContainer}>
+          <TouchableOpacity style={styles.socialButton}>
+            <Icon
+              name="facebook"
+              size={20}
+              color="#000000"
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.socialButton}>
+            <Icon name="apple" size={20} color="#000000" style={styles.icon} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.socialButton}>
+            <Icon name="google" size={20} color="#000000" style={styles.icon} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -108,7 +182,7 @@ export default function Login() {
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-      <TouchableOpacity onPress={handlePasswordReset}>
+      <TouchableOpacity onPress={() => setShowPasswordReset(true)}>
         <Text style={styles.forgotPassword}>
           Forgot your password? <Text style={styles.linkText}>Click here</Text>
         </Text>
@@ -130,7 +204,9 @@ export default function Login() {
         <Text style={styles.signInText}>Sign in</Text>
       </TouchableOpacity>
 
-      <Text style={styles.divider}>or continue with</Text>
+      <View style={styles.dividerContainer}>
+        <Text style={styles.divider}>or continue with</Text>
+      </View>
 
       <View style={styles.socialContainer}>
         <TouchableOpacity style={styles.socialButton}>
@@ -162,12 +238,17 @@ const styles = StyleSheet.create({
   backText: {
     fontSize: 32,
     color: "#00ADB5",
+    marginTop: 10,
+    margin: 5,
   },
   header: {
-    fontSize: 24,
+    textAlign: "center",
+    fontSize: 36,
     fontWeight: "600",
     color: "#00ADB5",
-    marginBottom: 30,
+    marginBottom: 0,
+    marginTop: 50,
+    padding: 10,
   },
   input: {
     width: "100%",
@@ -194,6 +275,20 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 10,
     color: "#4F4F4F",
+  },
+  emailButton: {
+    width: "100%",
+    backgroundColor: "#00ADB5",
+    paddingVertical: 15,
+    paddingHorizontal: 50,
+    borderRadius: 15,
+    alignItems: "center",
+    shadowColor: "#000000",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
+    marginTop: 0,
   },
   eyeIcon: {
     paddingHorizontal: 10,
@@ -239,14 +334,20 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   divider: {
-    marginVertical: 20,
     fontSize: 14,
     color: "#828282",
+    marginTop: 10,
+  },
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 50,
   },
   socialContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
+    padding: 50,
   },
   socialButton: {
     width: 50,
@@ -257,6 +358,34 @@ const styles = StyleSheet.create({
     borderColor: "#E0E0E0",
     justifyContent: "center",
     alignItems: "center",
+  },
+  stepsHeader: {
+    width: 200,
+    height: 100,
+    marginBottom: 30,
+    resizeMode: "contain",
+  },
+  continueButtonText: {
+    fontSize: 16,
+    color: "#FFFFFF",
+    fontWeight: "600",
+  },
+  subText: {
+    fontSize: 14,
+    color: "#4F4F4F",
+    fontWeight: "300",
+    textAlign: "center",
+    marginBottom: 30,
+    padding: 10,
+    margin: 5,
+    marginTop: 10,
+  },
+  resetSubText: {
+    fontSize: 14,
+    color: "#4F4F4F",
+    fontWeight: "300",
+    textAlign: "center",
+    marginBottom: 30,
   },
   icon: {},
   errorText: {
