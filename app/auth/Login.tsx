@@ -24,7 +24,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [resetError, setResetError] = useState("");
   const [showPasswordReset, setShowPasswordReset] = useState(false);
-  
+  const [passwordResetEmailSent, setPasswordResetEmailSent] = useState(false);
 
   const toggleTouchID = () =>
     setIsTouchIDEnabled((previousState) => !previousState);
@@ -58,9 +58,8 @@ export default function Login() {
 
     try {
       await sendPasswordResetEmail(auth, email);
-      alert("Password reset email sent! Please check your inbox.");
+      setPasswordResetEmailSent(true);
       setResetError("");
-      setShowPasswordReset(false);
     } catch (error) {
       if (error instanceof Error) {
         setResetError(error.message);
@@ -71,6 +70,39 @@ export default function Login() {
   };
 
   if (showPasswordReset) {
+    if (passwordResetEmailSent) {
+      return (
+        <View style={[styles.container, styles.centered]}>
+          <Image
+            source={require("../../assets/images/verification steps1.png")}
+            style={styles.stepsHeader}
+          />
+          <Image
+            source={require("../../assets/images/illustration.png")}
+            style={styles.verificationLogo}
+          />
+          <Text style={styles.verificationTitle}>Check your email</Text>
+          <Text style={styles.verificationText}>
+            We've sent a password reset link to:
+          </Text>
+          <Text style={styles.secondaryEmailText}>{email}</Text>
+          <Text style={styles.verificationInstructions}>
+            Please check your email and click the reset link to set a new
+            password.
+          </Text>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => {
+              setShowPasswordReset(false);
+              setPasswordResetEmailSent(false);
+              navigation.navigate("auth/Login");
+            }}
+          >
+            <Text style={styles.loginButtonText}>Return to Login</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
     return (
       <View style={styles.container}>
         <TouchableOpacity style={styles.backButton}>
@@ -241,6 +273,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     margin: 5,
   },
+  centered: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
   header: {
     textAlign: "center",
     fontSize: 36,
@@ -333,6 +370,47 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "600",
   },
+  verificationTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#00ADB5",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  verificationText: {
+    fontSize: 16,
+    color: "#4F4F4F",
+    fontWeight: "300",
+    textAlign: "center",
+    marginBottom: 5,
+    margin: 10,
+  },
+  verificationInstructions: {
+    fontSize: 14,
+    color: "#4F4F4F",
+    fontWeight: "300",
+    textAlign: "center",
+    marginBottom: 30,
+    padding: 10,
+    margin: 5,
+  },
+  loginButton: {
+    backgroundColor: "#00ADB5",
+    paddingVertical: 15,
+    paddingHorizontal: 50,
+    borderRadius: 15,
+    marginTop: 20,
+  },
+  loginButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  verificationLogo: {
+    width: 250,
+    height: 250,
+    resizeMode: "contain",
+  },
   divider: {
     fontSize: 14,
     color: "#828282",
@@ -386,6 +464,11 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     textAlign: "center",
     marginBottom: 30,
+  },
+  secondaryEmailText: {
+    fontSize: 16,
+    color: "#000000",
+    fontWeight: "600",
   },
   icon: {},
   errorText: {
