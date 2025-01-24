@@ -34,6 +34,7 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [passwordError, setPasswordError] = useState("");
   const [isTouchIDEnabled, setIsTouchIDEnabled] = useState(false);
 
   useEffect(() => {
@@ -85,15 +86,43 @@ export default function SignUp() {
     }
   };
 
+  const validatePassword = (password: string): boolean => {
+    const minLength = password.length >= 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (!minLength) {
+      setPasswordError("Password must be at least 8 characters");
+      return false;
+    }
+    if (!hasUpperCase) {
+      setPasswordError("Password must include an uppercase letter");
+      return false;
+    }
+    if (!hasNumber) {
+      setPasswordError("Password must include a number");
+      return false;
+    }
+    if (!hasSpecialChar) {
+      setPasswordError("Password must include a special character");
+      return false;
+    }
+
+    setPasswordError("");
+    return true;
+  };
+
   const handleCreatePassword = async () => {
     if (password !== confirmPassword) {
       setError("Passwords don't match");
+      return false;
+    }
+    if (!validatePassword(password)) {
+      setError(passwordError);
       return;
     }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
+    
 
     try {
       setLoading(true);
@@ -130,7 +159,7 @@ export default function SignUp() {
     return (
       <View style={[styles.container, styles.centered]}>
         <Image
-          source={require("../../assets/images/verification steps.png")}
+          source={require("../../assets/images/verification steps1.png")}
           style={styles.stepsHeader}
         />
         <Image
@@ -168,7 +197,7 @@ export default function SignUp() {
     return (
       <View style={styles.container}>
         <Image
-          source={require("../../assets/images/verification steps.png")}
+          source={require("../../assets/images/verification steps2.png")}
           style={styles.stepsHeader}
         />
         <Text style={styles.header}>Create your password</Text>
@@ -183,7 +212,10 @@ export default function SignUp() {
             placeholder="Enter password"
             secureTextEntry={secureTextEntry}
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => {
+              setPassword(text);
+              validatePassword(text);
+            }}
           />
           <TouchableOpacity
             onPress={() => setSecureTextEntry(!secureTextEntry)}
@@ -197,13 +229,17 @@ export default function SignUp() {
           </TouchableOpacity>
         </View>
 
+        <Text style={styles.confirmPasswordText}>Confirm password</Text>
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
             placeholder="Confirm password"
             secureTextEntry={secureTextEntry}
             value={confirmPassword}
-            onChangeText={setConfirmPassword}
+            onChangeText={(text) => {
+              setConfirmPassword(text);
+              validatePassword(text);
+            }}
           />
           <TouchableOpacity
             onPress={() => setSecureTextEntry(!secureTextEntry)}
@@ -228,6 +264,7 @@ export default function SignUp() {
         </View>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
         <TouchableOpacity
           style={styles.emailButton}
           onPress={handleCreatePassword}
@@ -245,6 +282,14 @@ export default function SignUp() {
   if (showEmailSignUp) {
     return (
       <View style={styles.container}>
+        <TouchableOpacity style={styles.backButton}>
+          <Text
+            style={styles.backText}
+            onPress={() => setShowEmailSignUp(false)}
+          >
+            {"<"}
+          </Text>
+        </TouchableOpacity>
         <Image
           source={require("../../assets/images/verification steps.png")}
           style={styles.stepsHeader}
@@ -371,6 +416,15 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     alignItems: "center",
   },
+  backButton: {
+    alignSelf: "flex-start",
+    marginTop: 0,
+    marginBottom: 100,
+  },
+  backText: {
+    fontSize: 36,
+    color: "#00ADB5",
+  },
   icon: {
     position: "absolute",
     left: 20,
@@ -380,6 +434,16 @@ const styles = StyleSheet.create({
   socialText: {
     fontSize: 16,
     color: "#4F4F4F",
+  },
+  input: {
+    width: "100%",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    marginBottom: 15,
   },
   passwordInput: {
     flex: 1,
@@ -460,6 +524,15 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     marginBottom: 10,
+  },
+  confirmPasswordText: {
+    alignSelf: "flex-start",
+    left: 0,
+    fontSize: 12,
+    color: "#4F4F4F",
+    fontWeight: "600",
+    marginBottom: 5,
+
   },
   centered: {
     justifyContent: "center",
