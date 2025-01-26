@@ -36,6 +36,7 @@ export default function SignUp() {
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   const [passwordError, setPasswordError] = useState("");
   const [isTouchIDEnabled, setIsTouchIDEnabled] = useState(false);
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -122,7 +123,6 @@ export default function SignUp() {
       setError(passwordError);
       return;
     }
-    
 
     try {
       setLoading(true);
@@ -139,7 +139,7 @@ export default function SignUp() {
 
       // Sign out and redirect to login
       await signOut(auth);
-      navigation.navigate("auth/Login");
+      setShowSuccessScreen(true);
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -194,6 +194,32 @@ export default function SignUp() {
   }
 
   if (showPasswordCreation) {
+    if (showSuccessScreen) {
+      return (
+        <View style={[styles.container, styles.centered]}>
+          <Image
+            source={require("../../assets/images/verification steps3.png")}
+            style={styles.stepsHeader}
+          />
+          <Image
+            source={require("../../assets/images/TickShield.png")}
+            style={styles.verificationLogo}
+          />
+          <Text style={styles.successTitle}>Congratulations!</Text>
+          <Text style={styles.successText}>
+            Congratulations your account is ready to use, now you can start
+            improving your financial literacy and managing your finances!
+          </Text>
+          <TouchableOpacity
+            style={styles.continueButton}
+            onPress={() => navigation.navigate("auth/Login")}
+          >
+            <Text style={styles.continueButtonText}>Continue</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
     return (
       <View style={styles.container}>
         <Image
@@ -435,6 +461,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#4F4F4F",
   },
+  successTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#00ADB5",
+    marginTop: 20,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  successText: {
+    fontSize: 16,
+    color: "#4F4F4F",
+    textAlign: "center",
+    marginHorizontal: 30,
+    marginBottom: 30,
+    lineHeight: 24,
+  },
+  continueButton: {
+    backgroundColor: "#00ADB5",
+    paddingVertical: 15,
+    paddingHorizontal: 50,
+    borderRadius: 15,
+    marginTop: 20,
+    width: "80%",
+    alignItems: "center",
+    shadowColor: "#000000",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
+  },
   input: {
     width: "100%",
     paddingVertical: 15,
@@ -532,7 +588,6 @@ const styles = StyleSheet.create({
     color: "#4F4F4F",
     fontWeight: "600",
     marginBottom: 5,
-
   },
   centered: {
     justifyContent: "center",
