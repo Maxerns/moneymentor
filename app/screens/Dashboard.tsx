@@ -1,18 +1,89 @@
-import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Modal,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../.expo/types/types";
 
+interface FinancialValue {
+  value: number | null;
+  isSet: boolean;
+}
+
 export default function DashboardPage() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  // State for financial values
+  const [budget, setBudget] = useState<FinancialValue>({
+    value: null,
+    isSet: false,
+  });
+  const [savings, setSavings] = useState<FinancialValue>({
+    value: null,
+    isSet: false,
+  });
+  const [debt, setDebt] = useState<FinancialValue>({
+    value: null,
+    isSet: false,
+  });
+
+  // Modal states
+  const [modalVisible, setModalVisible] = useState(false);
+  const [activeField, setActiveField] = useState<
+    "budget" | "savings" | "debt" | null
+  >(null);
+  const [tempValue, setTempValue] = useState("");
+
+  const handleEdit = (field: "budget" | "savings" | "debt") => {
+    setActiveField(field);
+    setTempValue(
+      field === "budget"
+        ? budget.value?.toString() || ""
+        : field === "savings"
+        ? savings.value?.toString() || ""
+        : debt.value?.toString() || ""
+    );
+    setModalVisible(true);
+  };
+
+  const handleSave = () => {
+    const numValue = parseFloat(tempValue);
+    if (isNaN(numValue)) return;
+
+    switch (activeField) {
+      case "budget":
+        setBudget({ value: numValue, isSet: true });
+        break;
+      case "savings":
+        setSavings({ value: numValue, isSet: true });
+        break;
+      case "debt":
+        setDebt({ value: numValue, isSet: true });
+        break;
+    }
+    setModalVisible(false);
+  };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity>
-          <Ionicons name="person-circle-outline" size={36} color="#344950" onPress={() => navigation.navigate('screens/Profile')} />
+          <Ionicons
+            name="person-circle-outline"
+            size={36}
+            color="#344950"
+            onPress={() => navigation.navigate("screens/Profile")}
+          />
         </TouchableOpacity>
         <Image
           source={require("../../assets/images/MoneyMentorLogoGradient.png")}
@@ -26,7 +97,22 @@ export default function DashboardPage() {
       {/* Budget Section */}
       <View style={styles.budgetContainer}>
         <Text style={styles.budgetTitle}>Budget</Text>
-        <Text style={styles.budgetValue}>£2,040.48</Text>
+        <View style={styles.valueContainer}>
+          {budget.isSet ? (
+            <>
+              <Text style={styles.budgetValue}>
+                £{budget.value?.toFixed(2)}
+              </Text>
+              <TouchableOpacity onPress={() => handleEdit("budget")}>
+                <MaterialIcons name="edit" size={24} color="#344950" />
+              </TouchableOpacity>
+            </>
+          ) : (
+            <TouchableOpacity onPress={() => handleEdit("budget")}>
+              <MaterialIcons name="add-circle" size={24} color="#344950" />
+            </TouchableOpacity>
+          )}
+        </View>
         <View style={styles.chartPlaceholder}>
           <Text style={styles.chartText}>[Chart Placeholder]</Text>
         </View>
@@ -37,14 +123,89 @@ export default function DashboardPage() {
         <View style={styles.card}>
           <MaterialIcons name="savings" size={24} color="#344950" />
           <Text style={styles.cardTitle}>Savings</Text>
-          <Text style={styles.cardValue}>£433.29</Text>
+          <View style={styles.valueContainer}>
+            {savings.isSet ? (
+              <>
+                <Text style={styles.cardValue}>
+                  £{savings.value?.toFixed(2)}
+                </Text>
+                <TouchableOpacity onPress={() => handleEdit("savings")}>
+                  <MaterialIcons name="edit" size={20} color="#344950" />
+                </TouchableOpacity>
+              </>
+            ) : (
+              <TouchableOpacity onPress={() => handleEdit("savings")}>
+                <MaterialIcons name="add-circle" size={24} color="#344950" />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
         <View style={styles.card}>
           <MaterialIcons name="credit-card" size={24} color="#344950" />
           <Text style={styles.cardTitle}>Debts</Text>
-          <Text style={styles.cardValue}>£234.73</Text>
+          <View style={styles.valueContainer}>
+            {debt.isSet ? (
+              <>
+                <Text style={styles.cardValue}>£{debt.value?.toFixed(2)}</Text>
+                <TouchableOpacity onPress={() => handleEdit("debt")}>
+                  <MaterialIcons name="edit" size={20} color="#344950" />
+                </TouchableOpacity>
+              </>
+            ) : (
+              <TouchableOpacity onPress={() => handleEdit("debt")}>
+                <MaterialIcons name="add-circle" size={24} color="#344950" />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </View>
+
+      {/* Edit Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.modalContainer}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              {activeField
+                ? `Enter ${
+                    activeField.charAt(0).toUpperCase() + activeField.slice(1)
+                  } Amount`
+                : ""}
+            </Text>
+            <TextInput
+              style={styles.modalInput}
+              keyboardType="decimal-pad"
+              value={tempValue}
+              onChangeText={setTempValue}
+              placeholder="Enter amount"
+              placeholderTextColor="#B0BEC5"
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={handleSave}
+              >
+                <Text style={styles.modalButtonText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Learning Card */}
       <View style={styles.learningCardContainer}>
         <View style={styles.learningCard}>
           <MaterialIcons name="create" size={24} color="#344950" />
@@ -195,5 +356,55 @@ const styles = StyleSheet.create({
     fontWeight: 500,
     color: "#344950",
     marginTop: 5,
+  },
+  valueContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  modalButton: {
+    padding: 10,
+    borderRadius: 5,
+    width: "40%",
+  },
+  saveButton: {
+    backgroundColor: "#00ADB5",
+  },
+  cancelButton: {
+    backgroundColor: "#E0E0E0",
+  },
+  modalButtonText: {
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
   },
 });
