@@ -9,6 +9,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Dimensions,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
@@ -16,14 +17,21 @@ import { RootStackParamList } from "../../.expo/types/types";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
-
+import { LineChart } from "react-native-chart-kit";
 interface FinancialValue {
   value: number;
   isSet: boolean;
 }
 
+interface BudgetHistory {
+  amount: number;
+  date: string;
+}
+
 export default function DashboardPage() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [budgetHistory, setBudgetHistory] = useState<BudgetHistory[]>([]);
+  const [isGuest, setIsGuest] = useState(true);
 
   // Initialize with 0 values
   const [budget, setBudget] = useState<FinancialValue>({
@@ -41,12 +49,15 @@ export default function DashboardPage() {
 
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Load user data on component mount
+  // Load user data on component mount and check auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUserId(user.uid);
+        setIsGuest(false);
         loadUserData(user.uid);
+      } else {
+        setIsGuest(true);
       }
     });
 
@@ -82,6 +93,9 @@ export default function DashboardPage() {
             value: data.debt.value,
             isSet: data.debt.isSet,
           });
+        }
+        if (data.budgetHistory) {
+          setBudgetHistory(data.budgetHistory);
         }
       }
     } catch (error) {
@@ -149,6 +163,26 @@ export default function DashboardPage() {
     }
 
     try {
+      if (activeField === "budget") {
+        const newHistoryEntry = {
+          amount: numValue,
+          date: new Date().toISOString().split("T")[0],
+        };
+
+        const updatedHistory = [...budgetHistory, newHistoryEntry];
+        setBudgetHistory(updatedHistory);
+
+        // Save to Firebase
+        const docRef = doc(db, "users", userId!);
+        await setDoc(
+          docRef,
+          {
+            budget: { value: numValue, isSet: true },
+            budgetHistory: updatedHistory,
+          },
+          { merge: true }
+        );
+      }
       switch (activeField) {
         case "budget":
           setBudget({ value: numValue, isSet: true });
@@ -212,9 +246,37 @@ export default function DashboardPage() {
             </>
           )}
         </View>
-        <View style={styles.chartPlaceholder}>
-          <Text style={styles.chartText}>[Chart Placeholder]</Text>
-        </View>
+        {!isGuest && budgetHistory.length > 0 && (
+          <View style={styles.chartContainer}>
+            <LineChart
+              data={{
+                labels: budgetHistory.map((entry) => entry.date),
+                datasets: [
+                  {
+                    data: budgetHistory.map((entry) => entry.amount),
+                  },
+                ],
+              }}
+              width={Dimensions.get("window").width - 40}
+              height={200}
+              chartConfig={{
+                backgroundColor: "transparent",
+                backgroundGradientFrom: "#E0F7FA",
+                backgroundGradientTo: "#E0F7FA",
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(52, 73, 80, ${opacity})`,
+                style: {
+                  borderRadius: 16,
+                },
+              }}
+              bezier
+              style={{
+                marginVertical: 8,
+                borderRadius: 16,
+              }}
+            />
+          </View>
+        )}
       </View>
 
       {/* Cards Section */}
@@ -354,6 +416,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F7F9FC",
     paddingHorizontal: 20,
+  },
+  chartContainer: {
+    width: "100%",
+    height: 200,
+    backgroundColor: "transparent",
+    borderRadius: 10,
+    marginTop: 10,
   },
   header: {
     flexDirection: "row",
