@@ -64,6 +64,11 @@ export default function DashboardPage() {
     return () => unsubscribe();
   }, []);
 
+  const getMonthName = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("default", { month: "short" });
+  };
+
   // Load user financial data from Firestore
   const loadUserData = async (uid: string) => {
     try {
@@ -250,15 +255,17 @@ export default function DashboardPage() {
           <View style={styles.chartContainer}>
             <LineChart
               data={{
-                labels: budgetHistory.map((entry) => entry.date),
+                labels: budgetHistory.map((entry) => getMonthName(entry.date)),
                 datasets: [
                   {
                     data: budgetHistory.map((entry) => entry.amount),
                   },
                 ],
               }}
-              width={Dimensions.get("window").width - 40}
+              width={Dimensions.get("window").width - 60}
               height={200}
+              withHorizontalLines={false}
+              withVerticalLines={false}
               chartConfig={{
                 backgroundColor: "transparent",
                 backgroundGradientFrom: "#E0F7FA",
