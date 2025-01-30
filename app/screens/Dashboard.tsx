@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -13,28 +13,115 @@ import {
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../.expo/types/types";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { auth, db } from "../../firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
 
 interface FinancialValue {
-  value: number | null;
+  value: number;
   isSet: boolean;
 }
 
 export default function DashboardPage() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  // State for financial values
+  // Initialize with 0 values
   const [budget, setBudget] = useState<FinancialValue>({
-    value: null,
+    value: 0,
     isSet: false,
   });
   const [savings, setSavings] = useState<FinancialValue>({
-    value: null,
+    value: 0,
     isSet: false,
   });
   const [debt, setDebt] = useState<FinancialValue>({
-    value: null,
+    value: 0,
     isSet: false,
   });
+
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Load user data on component mount
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+        loadUserData(user.uid);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Load user financial data from Firestore
+  const loadUserData = async (uid: string) => {
+    try {
+      const docRef = doc(db, "users", uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        console.log("Loaded data:", data);
+
+        if (data.budget) {
+          setBudget({
+            value: data.budget.value,
+            isSet: data.budget.isSet,
+          });
+        }
+
+        if (data.savings) {
+          setSavings({
+            value: data.savings.value,
+            isSet: data.savings.isSet,
+          });
+        }
+
+        if (data.debt) {
+          setDebt({
+            value: data.debt.value,
+            isSet: data.debt.isSet,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error loading user data:", error);
+    }
+  };
+
+  // Save user financial data to Firestore
+  const saveUserData = async (
+    field: "budget" | "savings" | "debt",
+    value: number
+  ) => {
+    if (!userId) return;
+
+    try {
+      const docRef = doc(db, "users", userId);
+      const docSnap = await getDoc(docRef);
+
+      let updateData = {};
+      if (docSnap.exists()) {
+        // Keep existing data
+        updateData = docSnap.data();
+      }
+
+      // Update specific field
+      updateData = {
+        ...updateData,
+        [field]: {
+          value: value,
+          isSet: true,
+        },
+      };
+
+      // Save to Firebase
+      await setDoc(docRef, updateData);
+      console.log("Data saved successfully");
+    } catch (error) {
+      console.error("Error saving user data:", error);
+    }
+  };
 
   // Modal states
   const [modalVisible, setModalVisible] = useState(false);
@@ -55,22 +142,33 @@ export default function DashboardPage() {
     setModalVisible(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const numValue = parseFloat(tempValue);
-    if (isNaN(numValue)) return;
-
-    switch (activeField) {
-      case "budget":
-        setBudget({ value: numValue, isSet: true });
-        break;
-      case "savings":
-        setSavings({ value: numValue, isSet: true });
-        break;
-      case "debt":
-        setDebt({ value: numValue, isSet: true });
-        break;
+    if (isNaN(numValue)) {
+      return;
     }
-    setModalVisible(false);
+
+    try {
+      switch (activeField) {
+        case "budget":
+          setBudget({ value: numValue, isSet: true });
+          await saveUserData("budget", numValue);
+          break;
+        case "savings":
+          setSavings({ value: numValue, isSet: true });
+          await saveUserData("savings", numValue);
+          break;
+        case "debt":
+          setDebt({ value: numValue, isSet: true });
+          await saveUserData("debt", numValue);
+          break;
+      }
+      setModalVisible(false);
+      setTempValue("");
+      setActiveField(null);
+    } catch (error) {
+      console.error("Error saving:", error);
+    }
   };
 
   return (
@@ -100,17 +198,18 @@ export default function DashboardPage() {
         <View style={styles.valueContainer}>
           {budget.isSet ? (
             <>
-              <Text style={styles.budgetValue}>
-                £{budget.value?.toFixed(2)}
-              </Text>
+              <Text style={styles.budgetValue}>£{budget.value.toFixed(2)}</Text>
               <TouchableOpacity onPress={() => handleEdit("budget")}>
                 <MaterialIcons name="edit" size={24} color="#344950" />
               </TouchableOpacity>
             </>
           ) : (
-            <TouchableOpacity onPress={() => handleEdit("budget")}>
-              <MaterialIcons name="add-circle" size={24} color="#344950" />
-            </TouchableOpacity>
+            <>
+              <Text style={styles.budgetValue}>£0.00</Text>
+              <TouchableOpacity onPress={() => handleEdit("budget")}>
+                <MaterialIcons name="add-circle" size={24} color="#344950" />
+              </TouchableOpacity>
+            </>
           )}
         </View>
         <View style={styles.chartPlaceholder}>
@@ -127,16 +226,19 @@ export default function DashboardPage() {
             {savings.isSet ? (
               <>
                 <Text style={styles.cardValue}>
-                  £{savings.value?.toFixed(2)}
+                  £{savings.value.toFixed(2)}
                 </Text>
                 <TouchableOpacity onPress={() => handleEdit("savings")}>
                   <MaterialIcons name="edit" size={20} color="#344950" />
                 </TouchableOpacity>
               </>
             ) : (
-              <TouchableOpacity onPress={() => handleEdit("savings")}>
-                <MaterialIcons name="add-circle" size={24} color="#344950" />
-              </TouchableOpacity>
+              <>
+                <Text style={styles.cardValue}>£0.00</Text>
+                <TouchableOpacity onPress={() => handleEdit("savings")}>
+                  <MaterialIcons name="add-circle" size={24} color="#344950" />
+                </TouchableOpacity>
+              </>
             )}
           </View>
         </View>
@@ -146,15 +248,18 @@ export default function DashboardPage() {
           <View style={styles.valueContainer}>
             {debt.isSet ? (
               <>
-                <Text style={styles.cardValue}>£{debt.value?.toFixed(2)}</Text>
+                <Text style={styles.cardValue}>£{debt.value.toFixed(2)}</Text>
                 <TouchableOpacity onPress={() => handleEdit("debt")}>
                   <MaterialIcons name="edit" size={20} color="#344950" />
                 </TouchableOpacity>
               </>
             ) : (
-              <TouchableOpacity onPress={() => handleEdit("debt")}>
-                <MaterialIcons name="add-circle" size={24} color="#344950" />
-              </TouchableOpacity>
+              <>
+                <Text style={styles.cardValue}>£0.00</Text>
+                <TouchableOpacity onPress={() => handleEdit("debt")}>
+                  <MaterialIcons name="add-circle" size={24} color="#344950" />
+                </TouchableOpacity>
+              </>
             )}
           </View>
         </View>
