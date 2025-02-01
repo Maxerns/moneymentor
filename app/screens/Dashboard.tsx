@@ -227,7 +227,12 @@ export default function DashboardPage() {
           style={styles.logo}
         />
         <TouchableOpacity>
-          <Ionicons name="settings-outline" size={36} color="#344950" />
+          <Ionicons
+            name="settings-outline"
+            size={36}
+            color="#344950"
+            onPress={() => navigation.navigate("screens/Settings")}
+          />
         </TouchableOpacity>
       </View>
 
