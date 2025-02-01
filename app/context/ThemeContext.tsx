@@ -8,7 +8,13 @@ export const lightTheme = {
   text: "#344950",
   secondaryText: "#707070",
   border: "#E0E0E0",
-  dangerText: "#FF0000",
+  icon: "#344950",
+  card: "#FFFFFF",
+  budget: "#E0F7FA",
+  modalBackground: "rgba(0, 0, 0, 0.5)",
+  success: "#4CAF50",
+  error: "#FF0000",
+  chart: "#B3E5FC",
 };
 
 export const darkTheme = {
@@ -18,7 +24,13 @@ export const darkTheme = {
   text: "#FFFFFF",
   secondaryText: "#B0BEC5",
   border: "#2C2C2C",
-  dangerText: "#FF6B6B",
+  icon: "#FFFFFF",
+  card: "#2C2C2C",
+  budget: "#1E3A3D",
+  modalBackground: "rgba(0, 0, 0, 0.8)",
+  success: "#66BB6A",
+  error: "#FF5252",
+  chart: "#1E3A3D",
 };
 
 type Theme = typeof lightTheme;

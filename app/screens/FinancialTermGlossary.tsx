@@ -11,10 +11,118 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../.expo/types/types";
+import { useTheme } from "../context/ThemeContext";
 
 export default function FinancialTermGlossary() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
+  const { theme } = useTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+      paddingHorizontal: 20,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: 40,
+      marginBottom: 20,
+    },
+    logo: {
+      width: 75,
+      height: 75,
+    },
+    pageTitle: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: theme.text,
+      marginBottom: 20,
+      textAlign: "center",
+    },
+    searchContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: theme.surface,
+      borderRadius: 10,
+      padding: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+      marginBottom: 20,
+    },
+    searchIcon: {
+      marginRight: 10,
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: 16,
+      color: theme.text,
+    },
+    letterSection: {
+      marginBottom: 20,
+    },
+    letter: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: theme.text,
+      marginBottom: 10,
+    },
+    termCard: {
+      backgroundColor: theme.surface,
+      borderRadius: 10,
+      padding: 15,
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    termText: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: theme.text,
+      marginBottom: 5,
+    },
+    definition: {
+      fontSize: 14,
+      color: theme.text,
+      marginBottom: 10,
+    },
+    learnMoreButton: {
+      backgroundColor: theme.primary,
+      borderRadius: 5,
+      paddingVertical: 5,
+      paddingHorizontal: 10,
+      alignSelf: "flex-start",
+    },
+    learnMoreText: {
+      fontSize: 14,
+      color: theme.surface,
+    },
+    navBar: {
+      position: "absolute",
+      bottom: 0,
+      width: "115%",
+      left: 0,
+      right: 0,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      backgroundColor: theme.surface,
+      paddingVertical: 10,
+      paddingHorizontal: 40,
+    },
+    navBarIcon: {
+      fontSize: 30,
+      color: theme.text,
+    },
+    navText: {
+      fontSize: 12,
+      fontWeight: "500",
+      color: theme.text,
+      marginTop: 5,
+    },
+  });
 
   const handleLetterPress = (letter: string) => {
     setSelectedLetter(letter === selectedLetter ? null : letter);
@@ -163,109 +271,3 @@ export default function FinancialTermGlossary() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F7F9FC",
-    paddingHorizontal: 20,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 40,
-    marginBottom: 20,
-  },
-  logo: {
-    width: 75,
-    height: 75,
-  },
-  pageTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#344950",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-    marginBottom: 20,
-  },
-  searchIcon: {
-    marginRight: 10,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: "#344950",
-  },
-  letterSection: {
-    marginBottom: 20,
-  },
-  letter: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#344950",
-    marginBottom: 10,
-  },
-  termCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-  },
-  termText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#344950",
-    marginBottom: 5,
-  },
-  definition: {
-    fontSize: 14,
-    color: "#344950",
-    marginBottom: 10,
-  },
-  learnMoreButton: {
-    backgroundColor: "#344950",
-    borderRadius: 5,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    alignSelf: "flex-start",
-  },
-  learnMoreText: {
-    fontSize: 14,
-    color: "#FFFFFF",
-  },
-  navBar: {
-    position: "absolute",
-    bottom: 0,
-    width: "115%",
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    paddingVertical: 10,
-    paddingHorizontal: 40,
-  },
-  navBarIcon: {
-    fontSize: 30,
-    color: "#344950",
-  },
-  navText: {
-    fontSize: 12,
-    fontWeight: "500",
-    color: "#344950",
-    marginTop: 5,
-  },
-});

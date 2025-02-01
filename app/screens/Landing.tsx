@@ -7,6 +7,7 @@ import { RootStackParamList } from '../../.expo/types/types';
 
 export default function Landing() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  // no dark theme as always will be seen in light mode
 
   return (
     <View style={styles.container}>

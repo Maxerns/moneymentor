@@ -12,12 +12,15 @@ import {
   Dimensions,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useNavigation, NavigationProp, ThemeContext } from "@react-navigation/native";
 import { RootStackParamList } from "../../.expo/types/types";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { LineChart } from "react-native-chart-kit";
+import { useTheme } from "../context/ThemeContext";
+
+
 interface FinancialValue {
   value: number;
   isSet: boolean;
@@ -32,6 +35,179 @@ export default function DashboardPage() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [budgetHistory, setBudgetHistory] = useState<BudgetHistory[]>([]);
   const [isGuest, setIsGuest] = useState(true);
+  const { theme } = useTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+      paddingHorizontal: 20,
+    },
+    chartContainer: {
+      width: "100%",
+      height: 200,
+      backgroundColor: theme.background,
+      borderRadius: 10,
+      marginTop: 10,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: 40,
+      marginBottom: 20,
+    },
+    logo: {
+      width: 75,
+      height: 75,
+      alignItems: "center",
+      marginBottom: 0,
+    },
+    budgetContainer: {
+      backgroundColor: theme.background,
+      borderRadius: 10,
+      padding: 20,
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    budgetTitle: {
+      fontSize: 18,
+      fontWeight: 500,
+      color: theme.text,
+    },
+    budgetValue: {
+      fontSize: 32,
+      fontWeight: "bold",
+      color: theme.text,
+      marginVertical: 10,
+    },
+    chartPlaceholder: {
+      width: "100%",
+      height: 100,
+      backgroundColor: theme.chart,
+      borderRadius: 10,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    chartText: {
+      color: theme.text,
+      fontSize: 14,
+    },
+    cardsContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    card: {
+      flex: 1,
+      backgroundColor: theme.background,
+      borderRadius: 10,
+      padding: 25,
+      margin: 50,
+      marginHorizontal: 5,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    learningCardContainer: {
+      alignItems: "center",
+    },
+    learningCard: {
+      width: "100%",
+      backgroundColor: theme.background,
+      borderRadius: 10,
+      padding: 25,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    cardTitle: {
+      fontSize: 16,
+      fontWeight: 500,
+      color: theme.text,
+      marginVertical: 5,
+    },
+    cardValue: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: theme.text,
+      opacity: 0.7,
+    },
+    navBar: {
+      position: "absolute",
+      bottom: 0,
+      width: "115%",
+      left: 0,
+      right: 0,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      backgroundColor: theme.background,
+      paddingVertical: 10,
+      paddingHorizontal: 40,
+    },
+    navBarIcon: {
+      fontSize: 30,
+      color: theme.icon,
+    },
+    navText: {
+      fontSize: 12,
+      fontWeight: 500,
+      color: theme.text,
+      marginTop: 5,
+    },
+    valueContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: theme.background,
+    },
+    modalContent: {
+      backgroundColor: theme.background,
+      padding: 20,
+      borderRadius: 10,
+      width: "80%",
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 15,
+      textAlign: "center",
+    },
+    modalInput: {
+      borderWidth: 1,
+      borderColor: theme.border,
+      borderRadius: 5,
+      padding: 10,
+      marginBottom: 15,
+    },
+    modalButtons: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+    },
+    modalButton: {
+      padding: 10,
+      borderRadius: 5,
+      width: "40%",
+    },
+    saveButton: {
+      backgroundColor: theme.background,
+    },
+    cancelButton: {
+      backgroundColor: theme.background,
+    },
+    modalButtonText: {
+      color: theme.text,
+      textAlign: "center",
+      fontWeight: "bold",
+    },
+  });
 
   // Initialize with 0 values
   const [budget, setBudget] = useState<FinancialValue>({
@@ -423,174 +599,4 @@ export default function DashboardPage() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F7F9FC",
-    paddingHorizontal: 20,
-  },
-  chartContainer: {
-    width: "100%",
-    height: 200,
-    backgroundColor: "transparent",
-    borderRadius: 10,
-    marginTop: 10,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 40,
-    marginBottom: 20,
-  },
-  logo: {
-    width: 75,
-    height: 75,
-    alignItems: "center",
-    marginBottom: 0,
-  },
-  budgetContainer: {
-    backgroundColor: "#E0F7FA",
-    borderRadius: 10,
-    padding: 20,
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  budgetTitle: {
-    fontSize: 18,
-    fontWeight: 500,
-    color: "#344950",
-  },
-  budgetValue: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#344950",
-    marginVertical: 10,
-  },
-  chartPlaceholder: {
-    width: "100%",
-    height: 100,
-    backgroundColor: "#B3E5FC",
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  chartText: {
-    color: "#4F4F4F",
-    fontSize: 14,
-  },
-  cardsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  card: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    padding: 25,
-    margin: 50,
-    marginHorizontal: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-  },
-  learningCardContainer: {
-    alignItems: "center",
-  },
-  learningCard: {
-    width: "100%",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    padding: 25,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 500,
-    color: "#344950",
-    marginVertical: 5,
-  },
-  cardValue: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#344950",
-    opacity: 0.7,
-  },
-  navBar: {
-    position: "absolute",
-    bottom: 0,
-    width: "115%",
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    paddingVertical: 10,
-    paddingHorizontal: 40,
-  },
-  navBarIcon: {
-    fontSize: 30,
-    color: "#344950",
-  },
-  navText: {
-    fontSize: 12,
-    fontWeight: 500,
-    color: "#344950",
-    marginTop: 5,
-  },
-  valueContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 10,
-    width: "80%",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 15,
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-  },
-  modalButton: {
-    padding: 10,
-    borderRadius: 5,
-    width: "40%",
-  },
-  saveButton: {
-    backgroundColor: "#00ADB5",
-  },
-  cancelButton: {
-    backgroundColor: "#E0E0E0",
-  },
-  modalButtonText: {
-    color: "white",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-});
+
