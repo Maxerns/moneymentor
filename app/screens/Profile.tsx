@@ -112,6 +112,13 @@ const Profile = () => {
       fontSize: 16,
       fontWeight: "bold",
     },
+    buttonContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      width: "100%",
+      marginVertical: 20,
+    },
     signOutButton: {
       backgroundColor: theme.surface,
       paddingVertical: 15,
@@ -336,10 +343,10 @@ const Profile = () => {
       setLoading(false);
     }
   };
-  
+
   const handleSignOut = async () => {
     try {
-      await signOut(auth); // Triggers auth state to change 
+      await signOut(auth); // Triggers auth state to change
       navigation.navigate("auth/Login");
     } catch (error) {
       console.error("Error signing out:", error);
@@ -569,19 +576,17 @@ const Profile = () => {
       </View>
 
       {/* Action Buttons */}
-      <TouchableOpacity
-        style={styles.editButton}
-        onPress={() => setShowEditOptions(true)}
-      >
-        <Text style={styles.editButtonText}>Edit Profile</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.signOutButton}
-        onPress={handleSignOut}
-      >
-        <Text style={styles.signOutButtonText}>Sign Out</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => setShowEditOptions(true)}
+        >
+          <Text style={styles.editButtonText}>Edit Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+          <Text style={styles.signOutButtonText}>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
       <EditOptionsModal />
       <PasswordChangeModal />
     </View>

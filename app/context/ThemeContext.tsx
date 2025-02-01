@@ -3,6 +3,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../../firebase/config";
 
+// Define light theme colors
 export const lightTheme = {
   background: "#F7F9FC",
   surface: "#FFFFFF",
@@ -19,6 +20,7 @@ export const lightTheme = {
   chart: "#B3E5FC",
 };
 
+// Define dark theme colors
 export const darkTheme = {
   background: "#121212",
   surface: "#1E1E1E",
@@ -43,16 +45,19 @@ interface ThemeContextType {
   toggleTheme: () => void;
 }
 
+// Create a context for theme management
 export const ThemeContext = createContext<ThemeContextType>({
   theme: lightTheme,
   isDark: false,
   toggleTheme: () => {},
 });
 
+// ThemeProvider component to manage theme state and provide it to the app
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [isDark, setIsDark] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
+  // Listen for authentication state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -60,13 +65,14 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         loadUserTheme(user.uid);
       } else {
         setUserId(null);
-        setIsDark(false); // Reset the theme when loggin out
+        setIsDark(false); // Reset the theme when logging out
       }
     });
 
     return () => unsubscribe();
   }, []);
 
+  // Load user's theme preference from Firestore
   const loadUserTheme = async (uid: string) => {
     try {
       const docRef = doc(db, "users", uid);
@@ -80,10 +86,12 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Load default theme (light theme)
   const loadDefaultTheme = async () => {
     setIsDark(false);
   };
 
+  // Toggle between light and dark themes
   const toggleTheme = async () => {
     try {
       const newTheme = !isDark;
@@ -107,4 +115,5 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// Custom hook to use the theme context
 export const useTheme = () => useContext(ThemeContext);

@@ -6,17 +6,30 @@ import {
   TouchableOpacity,
   Switch,
   ScrollView,
+  Modal,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../.expo/types/types";
 import { useTheme } from "../context/ThemeContext";
+import { deleteUser } from "firebase/auth";
+import { doc, deleteDoc } from "firebase/firestore";
+import { auth, db } from "../../firebase/config";
 
 export default function Settings() {
+  // Navigation hook for screen navigation
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  // State management for settings toggles
   const [notifications, setNotifications] = useState(true);
   const [biometrics, setBiometrics] = useState(false);
   const [analytics, setAnalytics] = useState(true);
+
+  // State for delete account modal
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+
+  // Theme context
   const { theme, isDark, toggleTheme } = useTheme();
 
   const styles = StyleSheet.create({
@@ -80,12 +93,137 @@ export default function Settings() {
       color: theme.secondaryText,
       fontSize: 14,
     },
-    dangerSection: {
+    deleteSection: {
       marginTop: 20,
       marginBottom: 40,
     },
+    modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: theme.modalBackground,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: 1000,
+    },
+    modalContent: {
+      backgroundColor: theme.surface,
+      borderRadius: 20,
+      padding: 20,
+      width: "90%",
+      alignItems: "center",
+    },
+    modalTitle: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: theme.text,
+      marginBottom: 10,
+    },
+    modalText: {
+      fontSize: 16,
+      color: theme.secondaryText,
+      textAlign: "center",
+      marginBottom: 20,
+    },
+    modalButtons: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      width: "100%",
+    },
+    modalButton: {
+      padding: 15,
+      borderRadius: 10,
+      width: "48%",
+    },
+    deleteButton: {
+      backgroundColor: "#FF3B30",
+    },
+    cancelButton: {
+      backgroundColor: theme.border,
+    },
+    deleteButtonText: {
+      color: "#FFFFFF",
+      textAlign: "center",
+      fontWeight: "bold",
+    },
+    cancelButtonText: {
+      color: theme.text,
+      textAlign: "center",
+      fontWeight: "bold",
+    },
+    errorText: {
+      color: theme.error,
+      marginBottom: 10,
+    },
   });
 
+  // Handler for account deletion
+  const handleDeleteAccount = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      // Delete user data from Firestore
+      await deleteDoc(doc(db, "users", user.uid));
+
+      // Delete the user account
+      await deleteUser(user);
+
+      // Navigate to landing page
+      navigation.navigate("screens/Landing");
+    } catch (error) {
+      if (error instanceof Error) {
+        setDeleteError(error.message);
+      } else {
+        setDeleteError("An error occurred while deleting your account");
+      }
+    }
+  };
+
+  // Modal component to confirm account deletion
+  const DeleteConfirmModal = () => {
+    const closeModal = () => setShowDeleteConfirm(false);
+
+    return (
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showDeleteConfirm}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Delete Account</Text>
+            <Text style={styles.modalText}>
+              Are you sure you want to delete your account? This action cannot
+              be undone.
+            </Text>
+            {deleteError ? (
+              <Text style={styles.errorText}>{deleteError}</Text>
+            ) : null}
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={closeModal}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.deleteButton]}
+                onPress={handleDeleteAccount}
+              >
+                <Text style={styles.deleteButtonText}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  // Resuable setting row component
   const SettingRow = ({
     icon,
     title,
@@ -94,6 +232,7 @@ export default function Settings() {
     toggle,
     onToggle,
   }: {
+    // props definition
     icon: string;
     title: string;
     value?: string;
@@ -243,17 +382,18 @@ export default function Settings() {
           </View>
         </View>
 
-        {/* Danger Zone */}
-        <View style={[styles.section, styles.dangerSection]}>
+        {/* delete Zone */}
+        <View style={[styles.section, styles.deleteSection]}>
           <View style={styles.sectionContent}>
             <SettingRow
               icon="trash-outline"
               title="Delete Account"
-              onPress={() => {}}
+              onPress={() => setShowDeleteConfirm(true)}
             />
           </View>
         </View>
       </ScrollView>
+      <DeleteConfirmModal />
     </View>
   );
 }

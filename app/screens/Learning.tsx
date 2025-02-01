@@ -119,14 +119,14 @@ export default function Learning() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity>
-          <Ionicons name="person-circle-outline" size={36} color="#344950" />
+          <Ionicons name="person-circle-outline" size={36} color="#344950" onPress={() => navigation.navigate("screens/Profile")}/>
         </TouchableOpacity>
         <Image
           source={require("../../assets/images/MoneyMentorLogoGradient.png")}
           style={styles.logo}
         />
         <TouchableOpacity>
-          <Ionicons name="settings-outline" size={36} color="#344950" />
+          <Ionicons name="settings-outline" size={36} color="#344950" onPress={() => navigation.navigate("screens/Settings")}/>
         </TouchableOpacity>
       </View>
 
