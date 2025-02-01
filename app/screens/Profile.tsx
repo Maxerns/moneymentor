@@ -16,12 +16,14 @@ import {
   updatePassword,
   EmailAuthProvider,
   reauthenticateWithCredential,
+  signOut,
 } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../.expo/types/types";
 import { useTheme } from "../context/ThemeContext";
+import { auth } from "@/firebase/config";
 
 const Profile = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -334,6 +336,15 @@ const Profile = () => {
       setLoading(false);
     }
   };
+  
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth); // Triggers auth state to change 
+      navigation.navigate("auth/Login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   if (loading) {
     return <ActivityIndicator size="large" color="#00ADB5" />;
@@ -567,7 +578,7 @@ const Profile = () => {
 
       <TouchableOpacity
         style={styles.signOutButton}
-        onPress={() => navigation.navigate("auth/Login")}
+        onPress={handleSignOut}
       >
         <Text style={styles.signOutButtonText}>Sign Out</Text>
       </TouchableOpacity>

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "../../firebase/config";
 
 export const lightTheme = {
   background: "#F7F9FC",
@@ -49,27 +51,48 @@ export const ThemeContext = createContext<ThemeContextType>({
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [isDark, setIsDark] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    loadThemePreference();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+        loadUserTheme(user.uid);
+      } else {
+        setUserId(null);
+        setIsDark(false); // Reset the theme when loggin out
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const loadThemePreference = async () => {
+  const loadUserTheme = async (uid: string) => {
     try {
-      const savedTheme = await AsyncStorage.getItem("isDarkMode");
-      if (savedTheme !== null) {
-        setIsDark(JSON.parse(savedTheme));
+      const docRef = doc(db, "users", uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists() && docSnap.data().isDarkMode !== undefined) {
+        setIsDark(docSnap.data().isDarkMode);
       }
     } catch (error) {
       console.error("Error loading theme:", error);
     }
   };
 
+  const loadDefaultTheme = async () => {
+    setIsDark(false);
+  };
+
   const toggleTheme = async () => {
     try {
       const newTheme = !isDark;
       setIsDark(newTheme);
-      await AsyncStorage.setItem("isDarkMode", JSON.stringify(newTheme));
+
+      if (userId) {
+        const docRef = doc(db, "users", userId);
+        await setDoc(docRef, { isDarkMode: newTheme }, { merge: true });
+      }
     } catch (error) {
       console.error("Error saving theme:", error);
     }
