@@ -12,6 +12,7 @@ import TaxEstimatorTool from "../screens/TaxEstimatorTool";
 import Profile from "../screens/Profile";
 import Settings from "../screens/Settings";
 import { useTheme } from "../context/ThemeContext";
+import ModuleContent from "../screens/ModuleContent";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -68,6 +69,7 @@ const Navigator = () => {
         />
         <Stack.Screen name="screens/Profile" component={Profile} />
         <Stack.Screen name="screens/Settings" component={Settings} />
+        <Stack.Screen name="screens/ModuleContent" component={ModuleContent} />
       </Stack.Navigator>
     </NavigationContainer>
   );

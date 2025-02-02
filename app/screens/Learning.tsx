@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,8 +14,10 @@ import { RootStackParamList } from "../../.expo/types/types";
 import { useTheme } from "../context/ThemeContext";
 
 export default function Learning() {
+  // navigation, theme hooks and search functionality
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { theme } = useTheme();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const styles = StyleSheet.create({
     container: {
@@ -114,25 +116,104 @@ export default function Learning() {
     },
   });
 
+  // Interface for module data structure
+  interface ModuleType {
+    title: string;
+    icon: keyof typeof MaterialCommunityIcons.glyphMap;
+    progress: string;
+  }
+
+  // Array of educational modules with their properties
+  const modules: ModuleType[] = [
+    {
+      title: "Interest Rates",
+      icon: "chart-line" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/7",
+    },
+    {
+      title: "Financial Term Glossary",
+      icon: "book-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/5",
+    },
+    {
+      title: "Investment Basics",
+      icon: "scale-balance" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/9",
+    },
+    {
+      title: "Budgeting Fundamentals",
+      icon: "bank" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/6",
+    },
+    {
+      title: "Credit & Debt Management",
+      icon: "credit-card" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/8",
+    },
+    {
+      title: "Mortgage Essentials",
+      icon: "home-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/5",
+    },
+    {
+      title: "Insurance Basics",
+      icon: "shield-check" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/6",
+    },
+    {
+      title: "Saving Strategies",
+      icon: "piggy-bank" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/7",
+    },
+    {
+      title: "Tax Planning",
+      icon: "calculator" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/5",
+    },
+    {
+      title: "Retirement Planning",
+      icon: "clock-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/8",
+    },
+    {
+      title: "Stock Market Basics",
+      icon: "chart-multiple" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/10",
+    },
+    {
+      title: "Student Finance",
+      icon: "school" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/6",
+    },
+  ];
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity>
-          <Ionicons name="person-circle-outline" size={36} color="#344950" onPress={() => navigation.navigate("screens/Profile")}/>
+          <Ionicons
+            name="person-circle-outline"
+            size={36}
+            color="#344950"
+            onPress={() => navigation.navigate("screens/Profile")}
+          />
         </TouchableOpacity>
         <Image
           source={require("../../assets/images/MoneyMentorLogoGradient.png")}
           style={styles.logo}
         />
         <TouchableOpacity>
-          <Ionicons name="settings-outline" size={36} color="#344950" onPress={() => navigation.navigate("screens/Settings")}/>
+          <Ionicons
+            name="settings-outline"
+            size={36}
+            color="#344950"
+            onPress={() => navigation.navigate("screens/Settings")}
+          />
         </TouchableOpacity>
       </View>
-
       {/* Page Title */}
       <Text style={styles.pageTitle}>Educational Modules</Text>
-
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <Ionicons
@@ -145,57 +226,40 @@ export default function Learning() {
           placeholder="Module search"
           placeholderTextColor="#B0BEC5"
           style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
         />
       </View>
-
-      {/* Module List */}
+      {/* Scrollable list of modules with search filter */}
       <ScrollView contentContainerStyle={styles.modulesContainer}>
-        <View style={styles.moduleCard}>
-          <MaterialCommunityIcons
-            name="chart-line"
-            size={48}
-            color="#344950"
-            opacity={0.7}
-          />
-          <View style={styles.moduleInfo}>
-            <Text style={styles.moduleTitle}>Interest Rates</Text>
-            <Text style={styles.moduleProgress}>3/7</Text>
-          </View>
-        </View>
-
-        <View style={styles.moduleCard}>
-          <MaterialCommunityIcons
-            name="book-outline"
-            size={48}
-            color="#344950"
-            opacity={0.7}
-          />
-          <View style={styles.moduleInfo}>
-            <Text style={styles.moduleTitle}>Financial Term Glossary</Text>
-            <Ionicons
-              name="chevron-forward-outline"
-              size={20}
-              color="#344950"
-              opacity={0.7}
+        {modules
+          // Filter modules based on search query
+          .filter((module) =>
+            module.title.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          // Map filtered modules to UI components
+          .map((module, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.moduleCard}
               onPress={() =>
-                navigation.navigate("screens/FinancialTermGlossary")
+                navigation.navigate("screens/ModuleContent", {
+                  title: module.title,
+                })
               }
-            />
-          </View>
-        </View>
-
-        <View style={styles.moduleCard}>
-          <MaterialCommunityIcons
-            name="scale-balance"
-            size={48}
-            color="#344950"
-            opacity={0.7}
-          />
-          <View style={styles.moduleInfo}>
-            <Text style={styles.moduleTitle}>Investment Basics</Text>
-            <Text style={styles.moduleProgress}>1/9</Text>
-          </View>
-        </View>
+            >
+              <MaterialCommunityIcons
+                name={module.icon}
+                size={48}
+                color="#344950"
+                opacity={0.7}
+              />
+              <View style={styles.moduleInfo}>
+                <Text style={styles.moduleTitle}>{module.title}</Text>
+                <Text style={styles.moduleProgress}>{module.progress}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
       </ScrollView>
 
       {/* Bottom Navigation */}

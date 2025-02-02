@@ -370,12 +370,12 @@ const Profile = () => {
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("screens/Dashboard")}
+            onPress={() => navigation.goBack()}
           >
             <Ionicons name="arrow-back" size={36} color="#344950" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Profile</Text>
-          <View style={{ width: 36 }} /> {/* Spacer for alignment */}
+          <View style={{ width: 36 }} /> 
         </View>
         <Text style={styles.message}>No user is logged in.</Text>
       </View>
