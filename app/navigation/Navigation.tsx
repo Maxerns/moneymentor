@@ -14,6 +14,7 @@ import Settings from "../screens/Settings";
 import { useTheme } from "../context/ThemeContext";
 import ModuleContent from "../screens/ModuleContent";
 import LearningPath from "../screens/LearningPath";
+import Tools from "../screens/Tools";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -72,6 +73,7 @@ const Navigator = () => {
         <Stack.Screen name="screens/Settings" component={Settings} />
         <Stack.Screen name="screens/ModuleContent" component={ModuleContent} />
         <Stack.Screen name="screens/LearningPath" component={LearningPath} />
+        <Stack.Screen name="screens/Tools" component={Tools} />
       </Stack.Navigator>
     </NavigationContainer>
   );

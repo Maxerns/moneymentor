@@ -11,7 +11,6 @@ export interface LearningPathType {
   name: string;
   description: string;
   modules: string[];
-  difficulty: "beginner" | "intermediate" | "advanced";
   order: string[];
 }
 

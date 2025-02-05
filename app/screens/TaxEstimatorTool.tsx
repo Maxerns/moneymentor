@@ -249,7 +249,7 @@ export default function TaxEstimatorTool() {
           <Ionicons name="construct-outline" style={styles.navBarIcon} />
           <Text
             style={styles.navText}
-            onPress={() => navigation.navigate("screens/TaxEstimatorTool")}
+            onPress={() => navigation.navigate("screens/Tools")}
           >
             Tools
           </Text>

@@ -124,14 +124,14 @@ export default function Learning() {
       marginTop: 5,
     },
     pathButton: {
-      backgroundColor: "#00ADB5",
+      backgroundColor: theme.primary,
       padding: 15,
       borderRadius: 10,
       marginBottom: 20,
       alignItems: "center",
     },
     pathButtonText: {
-      color: "#FFFFFF",
+      color: theme.surface,
       fontSize: 16,
       fontWeight: "600",
     },
@@ -139,29 +139,31 @@ export default function Learning() {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      backgroundColor: "#FFFFFF",
+      backgroundColor: theme.surface,
       padding: 15,
       borderRadius: 10,
       marginBottom: 20,
+      borderWidth: 1,
+      borderColor: theme.border,
     },
     currentPathText: {
-      color: "#344950",
+      color: theme.text,
       fontSize: 16,
     },
     changePath: {
-      backgroundColor: "#00ADB5",
+      backgroundColor: theme.primary,
       padding: 8,
       borderRadius: 5,
     },
     changePathText: {
-      color: "#FFFFFF",
+      color: theme.surface,
       fontSize: 14,
     },
     lockedModule: {
       opacity: 0.5,
     },
     lockedText: {
-      color: "#B0BEC5",
+      color: theme.secondaryText,
     },
   });
 
@@ -188,10 +190,8 @@ export default function Learning() {
           title: "What are Interest Rates?",
           content: "Introduction to interest rates and their importance...",
         },
-        // Add more sections as needed
       ],
     },
-    // Update other modules similarly with sections
     {
       title: "Financial Term Glossary",
       icon: "book-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
@@ -203,7 +203,192 @@ export default function Learning() {
         },
       ],
     },
-    // ...rest of the modules with their sections
+    {
+      title: "Budgeting Fundamentals",
+      icon: "bank" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/6",
+      sections: [
+        {
+          title: "Introduction to Budgeting",
+          content:
+            "Learn the fundamentals of budgeting and its importance in financial planning. Understand how budgeting helps track income, expenses, and achieve financial goals.",
+          examples: [
+            "Monthly budget template",
+            "Income tracking methods",
+            "Expense categories",
+          ],
+        },
+        {
+          title: "50/30/20 Rule",
+          content:
+            "Master the popular budgeting technique that allocates 50% to needs, 30% to wants, and 20% to savings and debt repayment.",
+          examples: [
+            "Essential expenses breakdown",
+            "Discretionary spending examples",
+            "Savings allocation strategies",
+          ],
+        },
+        {
+          title: "Creating Your First Budget",
+          content:
+            "Step-by-step guide to creating a personalized budget. Learn to categorize expenses, set realistic goals, and maintain financial discipline.",
+          examples: [
+            "Budget worksheets",
+            "Goal-setting templates",
+            "Expense tracking tools",
+          ],
+        },
+      ],
+    },
+    {
+      title: "Saving Strategies",
+      icon: "piggy-bank" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/7",
+      sections: [
+        {
+          title: "Emergency Fund Basics",
+          content:
+            "Understanding the importance of emergency funds and how to build one. Learn about recommended fund sizes and optimal saving strategies.",
+          examples: [
+            "3-6 months expenses calculation",
+            "High-yield savings accounts",
+            "Automatic saving methods",
+          ],
+        },
+        {
+          title: "Smart Saving Techniques",
+          content:
+            "Discover practical methods to increase savings through automated transfers, spending reduction, and income optimization.",
+          examples: [
+            "Round-up saving apps",
+            "Expense reduction strategies",
+            "Side hustle opportunities",
+          ],
+        },
+      ],
+    },
+    {
+      title: "Credit & Debt Management",
+      icon: "credit-card" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/8",
+      sections: [
+        {
+          title: "Understanding Credit Scores",
+          content:
+            "Learn about credit score components, factors affecting your score, and strategies for improvement.",
+          examples: [
+            "Credit score ranges",
+            "Credit report elements",
+            "Score improvement tactics",
+          ],
+        },
+        {
+          title: "Debt Reduction Strategies",
+          content:
+            "Explore effective methods for managing and reducing debt, including prioritization and consolidation options.",
+          examples: [
+            "Debt snowball method",
+            "Debt avalanche approach",
+            "Consolidation loans",
+          ],
+        },
+      ],
+    },
+    {
+      title: "Investment Basics",
+      icon: "chart-line" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/9",
+      sections: [
+        {
+          title: "Investment Fundamentals",
+          content:
+            "Introduction to basic investment concepts, risk tolerance, and different investment vehicles.",
+          examples: [
+            "Risk vs. return",
+            "Asset classes",
+            "Investment timeframes",
+          ],
+        },
+        {
+          title: "Building a Portfolio",
+          content:
+            "Learn about portfolio diversification, asset allocation, and investment strategies.",
+          examples: [
+            "Diversification methods",
+            "Asset allocation models",
+            "Rebalancing techniques",
+          ],
+        },
+      ],
+    },
+    {
+      title: "Stock Market Basics",
+      icon: "chart-multiple" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/10",
+      sections: [
+        {
+          title: "Stock Market Introduction",
+          content:
+            "Understanding stock markets, exchanges, and basic trading concepts.",
+          examples: ["Market indices", "Trading hours", "Order types"],
+        },
+        {
+          title: "Stock Analysis",
+          content:
+            "Learn fundamental and technical analysis methods for evaluating stocks.",
+          examples: [
+            "P/E ratios",
+            "Market capitalization",
+            "Technical indicators",
+          ],
+        },
+      ],
+    },
+    {
+      title: "Retirement Planning",
+      icon: "clock-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/8",
+      sections: [
+        {
+          title: "Retirement Basics",
+          content:
+            "Understanding retirement accounts, contribution limits, and investment options.",
+          examples: ["401(k) plans", "IRA types", "Pension systems"],
+        },
+        {
+          title: "Retirement Strategies",
+          content:
+            "Learn about retirement planning strategies, withdrawal rates, and Social Security benefits.",
+          examples: [
+            "4% rule",
+            "Social Security claiming",
+            "Required minimum distributions",
+          ],
+        },
+      ],
+    },
+    {
+      title: "Tax Planning",
+      icon: "calculator" as keyof typeof MaterialCommunityIcons.glyphMap,
+      progress: "0/5",
+      sections: [
+        {
+          title: "Tax Fundamentals",
+          content: "Understanding tax brackets, deductions, and credits.",
+          examples: ["Tax brackets", "Standard deduction", "Common credits"],
+        },
+        {
+          title: "Tax Reduction Strategies",
+          content:
+            "Learn legal methods to minimize tax liability through deductions and credits.",
+          examples: [
+            "Tax-advantaged accounts",
+            "Charitable giving",
+            "Business deductions",
+          ],
+        },
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -397,7 +582,7 @@ export default function Learning() {
           <Ionicons
             name="construct-outline"
             style={styles.navBarIcon}
-            onPress={() => navigation.navigate("screens/TaxEstimatorTool")}
+            onPress={() => navigation.navigate("screens/Tools")}
           />
           <Text style={styles.navText}>Tools</Text>
         </TouchableOpacity>

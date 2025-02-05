@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { learningPaths } from '../services/learningService';
-import { useTheme } from '@/app/context/ThemeContext';
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { learningPaths } from "../services/learningService";
+import { useTheme } from "@/app/context/ThemeContext";
 
-export const LearningPathSelector = ({ 
+export const LearningPathSelector = ({
   selectedPath,
-  onSelectPath 
+  onSelectPath,
 }: {
   selectedPath: string;
   onSelectPath: (pathId: string) => void;
@@ -14,22 +14,23 @@ export const LearningPathSelector = ({
 
   return (
     <View style={styles.container}>
-      {learningPaths.map(path => (
+      {learningPaths.map((path) => (
         <TouchableOpacity
           key={path.id}
           style={[
             styles.pathCard,
             { backgroundColor: theme.surface },
-            selectedPath === path.id && styles.selectedCard
+            selectedPath === path.id && styles.selectedCard,
           ]}
           onPress={() => onSelectPath(path.id)}
         >
-          <Text style={[styles.pathName, { color: theme.text }]}>{path.name}</Text>
-          <Text style={[styles.pathDescription, { color: theme.secondaryText }]}>
-            {path.description}
+          <Text style={[styles.pathName, { color: theme.text }]}>
+            {path.name}
           </Text>
-          <Text style={[styles.difficulty, { color: theme.primary }]}>
-            {path.difficulty}
+          <Text
+            style={[styles.pathDescription, { color: theme.secondaryText }]}
+          >
+            {path.description}
           </Text>
         </TouchableOpacity>
       ))}
@@ -49,11 +50,11 @@ const styles = StyleSheet.create({
   },
   selectedCard: {
     borderWidth: 2,
-    borderColor: '#00ADB5',
+    borderColor: "#00ADB5",
   },
   pathName: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   pathDescription: {
@@ -62,6 +63,6 @@ const styles = StyleSheet.create({
   },
   difficulty: {
     fontSize: 12,
-    fontWeight: '500',
-  }
+    fontWeight: "500",
+  },
 });

@@ -16,15 +16,13 @@ export const learningPaths: LearningPathType[] = [
       "Saving Strategies",
       "Credit & Debt Management",
     ],
-    difficulty: "beginner",
     order: ["module1", "module2", "module3"],
   },
   {
     id: "intermediate",
     name: "Investment Focus",
     description: "Learn how to grow your wealth",
-    modules: ["Investment Basics", "Interest Rates", "Stock Market"],
-    difficulty: "intermediate",
+    modules: ["Investment Basics", "Interest Rates", "Stock Market Basics"],
     order: ["module4", "module5", "module6"],
   },
   {
@@ -32,7 +30,6 @@ export const learningPaths: LearningPathType[] = [
     name: "Wealth Building",
     description: "Advanced strategies for financial growth",
     modules: ["Tax Planning", "Retirement", "Estate Planning"],
-    difficulty: "advanced",
     order: ["module7", "module8", "module9"],
   },
 ];

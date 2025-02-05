@@ -251,7 +251,7 @@ export default function FinancialTermGlossary() {
           <Ionicons
             name="construct-outline"
             style={styles.navBarIcon}
-            onPress={() => navigation.navigate("screens/TaxEstimatorTool")}
+            onPress={() => navigation.navigate("screens/Tools")}
           />
           <Text style={styles.navText}>Tools</Text>
         </TouchableOpacity>
