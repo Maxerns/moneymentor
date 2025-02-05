@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,6 +10,9 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { useTheme } from "../context/ThemeContext";
+import { learningService } from "../services/learningService";
+import { auth } from "@/firebase/config";
+import { ModuleProgress } from "../types/learningTypes";
 
 // Define content interface
 interface ModuleSection {
@@ -442,6 +445,34 @@ export default function ModuleContent() {
   const { theme } = useTheme();
   const moduleTitle = route.params?.title;
   const content = moduleContents[moduleTitle];
+  const [progress, setProgress] = useState<ModuleProgress | null>(null);
+
+  useEffect(() => {
+    const loadProgress = async () => {
+      const userProgress = await learningService.getUserProgress();
+      if (userProgress?.progress[moduleTitle]) {
+        setProgress(userProgress.progress[moduleTitle]);
+      }
+    };
+    loadProgress();
+  }, [moduleTitle]);
+
+  const handleCompleteSection = async (sectionTitle: string) => {
+    if (!auth.currentUser) return;
+
+    const newProgress = {
+      moduleId: moduleTitle,
+      completed: false,
+      lastAccessed: new Date().toISOString(),
+      sectionsCompleted: [...(progress?.sectionsCompleted || []), sectionTitle],
+    };
+
+    // Update UI immediately
+    setProgress(newProgress);
+
+    // Save to Firebase
+    await learningService.updateModuleProgress(moduleTitle, newProgress);
+  };
 
   const styles = StyleSheet.create({
     container: {

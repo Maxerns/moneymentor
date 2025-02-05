@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,17 +7,26 @@ import {
   Image,
   TextInput,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../.expo/types/types";
 import { useTheme } from "../context/ThemeContext";
+import { auth } from "@/firebase/config";
+import { learningPaths, learningService } from "../services/learningService";
+import { UserLearningProgress, ModuleProgress } from "../types/learningTypes";
 
 export default function Learning() {
   // navigation, theme hooks and search functionality
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
+  const [userProgress, setUserProgress] = useState<UserLearningProgress | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+  const isGuest = !auth.currentUser;
 
   const styles = StyleSheet.create({
     container: {
@@ -114,6 +123,46 @@ export default function Learning() {
       color: theme.text,
       marginTop: 5,
     },
+    pathButton: {
+      backgroundColor: "#00ADB5",
+      padding: 15,
+      borderRadius: 10,
+      marginBottom: 20,
+      alignItems: "center",
+    },
+    pathButtonText: {
+      color: "#FFFFFF",
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    currentPath: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      backgroundColor: "#FFFFFF",
+      padding: 15,
+      borderRadius: 10,
+      marginBottom: 20,
+    },
+    currentPathText: {
+      color: "#344950",
+      fontSize: 16,
+    },
+    changePath: {
+      backgroundColor: "#00ADB5",
+      padding: 8,
+      borderRadius: 5,
+    },
+    changePathText: {
+      color: "#FFFFFF",
+      fontSize: 14,
+    },
+    lockedModule: {
+      opacity: 0.5,
+    },
+    lockedText: {
+      color: "#B0BEC5",
+    },
   });
 
   // Interface for module data structure
@@ -121,6 +170,11 @@ export default function Learning() {
     title: string;
     icon: keyof typeof MaterialCommunityIcons.glyphMap;
     progress: string;
+    sections: {
+      title: string;
+      content: string;
+      examples?: string[];
+    }[];
   }
 
   // Array of educational modules with their properties
@@ -129,91 +183,116 @@ export default function Learning() {
       title: "Interest Rates",
       icon: "chart-line" as keyof typeof MaterialCommunityIcons.glyphMap,
       progress: "0/7",
+      sections: [
+        {
+          title: "What are Interest Rates?",
+          content: "Introduction to interest rates and their importance...",
+        },
+        // Add more sections as needed
+      ],
     },
+    // Update other modules similarly with sections
     {
       title: "Financial Term Glossary",
       icon: "book-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
       progress: "0/5",
+      sections: [
+        {
+          title: "Basic Financial Terms",
+          content: "Essential financial terminology...",
+        },
+      ],
     },
-    {
-      title: "Investment Basics",
-      icon: "scale-balance" as keyof typeof MaterialCommunityIcons.glyphMap,
-      progress: "0/9",
-    },
-    {
-      title: "Budgeting Fundamentals",
-      icon: "bank" as keyof typeof MaterialCommunityIcons.glyphMap,
-      progress: "0/6",
-    },
-    {
-      title: "Credit & Debt Management",
-      icon: "credit-card" as keyof typeof MaterialCommunityIcons.glyphMap,
-      progress: "0/8",
-    },
-    {
-      title: "Mortgage Essentials",
-      icon: "home-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
-      progress: "0/5",
-    },
-    {
-      title: "Insurance Basics",
-      icon: "shield-check" as keyof typeof MaterialCommunityIcons.glyphMap,
-      progress: "0/6",
-    },
-    {
-      title: "Saving Strategies",
-      icon: "piggy-bank" as keyof typeof MaterialCommunityIcons.glyphMap,
-      progress: "0/7",
-    },
-    {
-      title: "Tax Planning",
-      icon: "calculator" as keyof typeof MaterialCommunityIcons.glyphMap,
-      progress: "0/5",
-    },
-    {
-      title: "Retirement Planning",
-      icon: "clock-outline" as keyof typeof MaterialCommunityIcons.glyphMap,
-      progress: "0/8",
-    },
-    {
-      title: "Stock Market Basics",
-      icon: "chart-multiple" as keyof typeof MaterialCommunityIcons.glyphMap,
-      progress: "0/10",
-    },
-    {
-      title: "Student Finance",
-      icon: "school" as keyof typeof MaterialCommunityIcons.glyphMap,
-      progress: "0/6",
-    },
+    // ...rest of the modules with their sections
   ];
+
+  useEffect(() => {
+    const loadUserProgress = async () => {
+      if (!auth.currentUser) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const progress = await learningService.getUserProgress();
+        setUserProgress(progress);
+      } catch (error) {
+        console.error("Error loading progress:", error);
+        Alert.alert(
+          "Error",
+          "Failed to load your learning progress. Please try again later."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserProgress();
+  }, []);
+
+  const getModuleProgress = (moduleId: string): string => {
+    if (!userProgress?.progress[moduleId]) return "0/1";
+    const moduleProgress = userProgress.progress[moduleId];
+    const module = modules.find((m) => m.title === moduleId);
+    return `${moduleProgress.sectionsCompleted.length}/${
+      module?.sections.length || 1
+    }`;
+  };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity>
-          <Ionicons
-            name="person-circle-outline"
-            size={36}
-            color="#344950"
-            onPress={() => navigation.navigate("screens/Profile")}
-          />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("screens/Profile")}
+        >
+          <Ionicons name="person-circle-outline" size={36} color="#344950" />
         </TouchableOpacity>
         <Image
           source={require("../../assets/images/MoneyMentorLogoGradient.png")}
           style={styles.logo}
         />
-        <TouchableOpacity>
-          <Ionicons
-            name="settings-outline"
-            size={36}
-            color="#344950"
-            onPress={() => navigation.navigate("screens/Settings")}
-          />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("screens/Settings")}
+        >
+          <Ionicons name="settings-outline" size={36} color="#344950" />
         </TouchableOpacity>
       </View>
-      {/* Page Title */}
+
       <Text style={styles.pageTitle}>Educational Modules</Text>
+
+      {/* Learning Path Section */}
+      {!isGuest && (
+        <>
+          {!userProgress?.selectedPath ? (
+            <TouchableOpacity
+              style={styles.pathButton}
+              onPress={() => navigation.navigate("screens/LearningPath")}
+            >
+              <Text style={styles.pathButtonText}>
+                Choose Your Learning Path
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.currentPath}>
+              <Text style={styles.currentPathText}>
+                Current Path:{" "}
+                {
+                  learningPaths.find((p) => p.id === userProgress.selectedPath)
+                    ?.name
+                }
+              </Text>
+              <TouchableOpacity
+                style={styles.changePath}
+                onPress={() => navigation.navigate("screens/LearningPath")}
+              >
+                <Text style={styles.changePathText}>Change</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </>
+      )}
+
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <Ionicons
@@ -230,33 +309,75 @@ export default function Learning() {
           onChangeText={setSearchQuery}
         />
       </View>
-      {/* Scrollable list of modules with search filter */}
+
+      {/* Module List */}
       <ScrollView contentContainerStyle={styles.modulesContainer}>
         {modules
-          // Filter modules based on search query
           .filter((module) =>
             module.title.toLowerCase().includes(searchQuery.toLowerCase())
           )
-          // Map filtered modules to UI components
           .map((module, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.moduleCard}
-              onPress={() =>
-                navigation.navigate("screens/ModuleContent", {
-                  title: module.title,
-                })
-              }
+              style={[
+                styles.moduleCard,
+                isGuest && styles.lockedModule, // Add locked style for guests
+              ]}
+              onPress={() => {
+                if (isGuest) {
+                  Alert.alert(
+                    "Create Account",
+                    "Please create an account to access the educational modules and track your progress!",
+                    [
+                      {
+                        text: "Not Now",
+                        style: "cancel",
+                      },
+                      {
+                        text: "Sign Up",
+                        onPress: () => navigation.navigate("auth/SignUp"),
+                      },
+                    ]
+                  );
+                } else {
+                  // authentication check and navigation
+                  if (
+                    !userProgress?.selectedPath ||
+                    userProgress.recommendations.includes(module.title)
+                  ) {
+                    navigation.navigate("screens/ModuleContent", {
+                      title: module.title,
+                    });
+                  } else {
+                    Alert.alert(
+                      "Module Locked",
+                      "Complete your current learning path modules first"
+                    );
+                  }
+                }
+              }}
             >
               <MaterialCommunityIcons
                 name={module.icon}
                 size={48}
                 color="#344950"
-                opacity={0.7}
+                opacity={
+                  isGuest
+                    ? 0.4
+                    : userProgress?.recommendations.includes(module.title)
+                    ? 1
+                    : 0.4
+                }
               />
               <View style={styles.moduleInfo}>
-                <Text style={styles.moduleTitle}>{module.title}</Text>
-                <Text style={styles.moduleProgress}>{module.progress}</Text>
+                <Text
+                  style={[styles.moduleTitle, isGuest && styles.lockedText]}
+                >
+                  {module.title}
+                </Text>
+                <Text style={styles.moduleProgress}>
+                  {isGuest ? "Locked" : getModuleProgress(module.title)}
+                </Text>
               </View>
             </TouchableOpacity>
           ))}
