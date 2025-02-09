@@ -587,7 +587,8 @@ export default function Learning() {
           <Text style={styles.navText}>Tools</Text>
         </TouchableOpacity>
         <TouchableOpacity>
-          <Ionicons name="analytics-outline" style={styles.navBarIcon} />
+          <Ionicons name="analytics-outline" style={styles.navBarIcon} 
+          onPress={() => navigation.navigate("screens/Analytics")}/>
           <Text style={styles.navText}>Analysis</Text>
         </TouchableOpacity>
         <TouchableOpacity>

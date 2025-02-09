@@ -162,14 +162,24 @@ export default function TaxEstimatorTool() {
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity>
-            <Ionicons name="person-circle-outline" size={36} color="#344950" onPress={() => navigation.navigate("screens/Profile")} />
+            <Ionicons
+              name="person-circle-outline"
+              size={36}
+              color="#344950"
+              onPress={() => navigation.navigate("screens/Profile")}
+            />
           </TouchableOpacity>
           <Image
             source={require("../../assets/images/MoneyMentorLogoGradient.png")}
             style={styles.logo}
           />
           <TouchableOpacity>
-            <Ionicons name="settings-outline" size={36} color="#344950" onPress={() => navigation.navigate("screens/Settings")} />
+            <Ionicons
+              name="settings-outline"
+              size={36}
+              color="#344950"
+              onPress={() => navigation.navigate("screens/Settings")}
+            />
           </TouchableOpacity>
         </View>
         <Text style={styles.title}>Tax Estimator Tool</Text>
@@ -255,7 +265,11 @@ export default function TaxEstimatorTool() {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity>
-          <Ionicons name="analytics-outline" style={styles.navBarIcon} />
+          <Ionicons
+            name="analytics-outline"
+            style={styles.navBarIcon}
+            onPress={() => navigation.navigate("screens/Analytics")}
+          />
           <Text style={styles.navText}>Analysis</Text>
         </TouchableOpacity>
         <TouchableOpacity>

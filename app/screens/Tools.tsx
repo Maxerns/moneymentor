@@ -13,11 +13,14 @@ import { RootStackParamList } from "../../.expo/types/types";
 import { useTheme } from "../context/ThemeContext";
 
 interface ToolType {
-    title: string;
-    description: string;
-    icon: keyof typeof MaterialCommunityIcons.glyphMap;
-    route: Extract<keyof RootStackParamList, 'screens/FinancialTermGlossary' | 'screens/TaxEstimatorTool'>;
-  }
+  title: string;
+  description: string;
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  route: Extract<
+    keyof RootStackParamList,
+    "screens/FinancialTermGlossary" | "screens/TaxEstimatorTool"
+  >;
+}
 
 export default function Tools() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -32,7 +35,8 @@ export default function Tools() {
     },
     {
       title: "Tax Estimator",
-      description: "Calculate your estimated tax obligations and potential savings",
+      description:
+        "Calculate your estimated tax obligations and potential savings",
       icon: "calculator" as keyof typeof MaterialCommunityIcons.glyphMap,
       route: "screens/TaxEstimatorTool",
     },
@@ -123,14 +127,18 @@ export default function Tools() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("screens/Profile")}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("screens/Profile")}
+        >
           <Ionicons name="person-circle-outline" size={36} color="#344950" />
         </TouchableOpacity>
         <Image
           source={require("../../assets/images/MoneyMentorLogoGradient.png")}
           style={styles.logo}
         />
-        <TouchableOpacity onPress={() => navigation.navigate("screens/Settings")}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("screens/Settings")}
+        >
           <Ionicons name="settings-outline" size={36} color="#344950" />
         </TouchableOpacity>
       </View>
@@ -163,7 +171,9 @@ export default function Tools() {
 
       {/* Bottom Navigation */}
       <View style={styles.navBar}>
-        <TouchableOpacity onPress={() => navigation.navigate("screens/Dashboard")}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("screens/Dashboard")}
+        >
           <Ionicons name="home-outline" style={styles.navBarIcon} />
           <Text style={styles.navText}>Dashboard</Text>
         </TouchableOpacity>
@@ -172,10 +182,16 @@ export default function Tools() {
           <Text style={styles.navText}>Tools</Text>
         </TouchableOpacity>
         <TouchableOpacity>
-          <Ionicons name="analytics-outline" style={styles.navBarIcon} />
+          <Ionicons
+            name="analytics-outline"
+            style={styles.navBarIcon}
+            onPress={() => navigation.navigate("screens/Analytics")}
+          />
           <Text style={styles.navText}>Analysis</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("screens/Learning")}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("screens/Learning")}
+        >
           <Ionicons name="school-outline" style={styles.navBarIcon} />
           <Text style={styles.navText}>Learning</Text>
         </TouchableOpacity>
