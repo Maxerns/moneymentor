@@ -16,11 +16,14 @@ import {
   updatePassword,
   EmailAuthProvider,
   reauthenticateWithCredential,
+  signOut,
 } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../.expo/types/types";
+import { useTheme } from "../context/ThemeContext";
+import { auth } from "@/firebase/config";
 
 const Profile = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -33,7 +36,239 @@ const Profile = () => {
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState(false);
   const [showEditOptions, setShowEditOptions] = useState(false);
+  const { theme } = useTheme();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 20,
+      paddingTop: 40,
+      paddingBottom: 20,
+      backgroundColor: theme.surface,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: theme.text,
+    },
+    profileContainer: {
+      alignItems: "center",
+      padding: 20,
+    },
+    profileImage: {
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      marginBottom: 20,
+      borderWidth: 3,
+      borderColor: theme.primary,
+    },
+    name: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: theme.text,
+      marginBottom: 5,
+    },
+    email: {
+      fontSize: 16,
+      color: theme.secondaryText,
+      marginBottom: 20,
+    },
+    detailsContainer: {
+      width: "100%",
+      backgroundColor: theme.surface,
+      borderRadius: 10,
+      padding: 20,
+      marginBottom: 20,
+    },
+    detailItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 15,
+    },
+    detailText: {
+      marginLeft: 10,
+      fontSize: 16,
+      color: theme.text,
+    },
+    editButton: {
+      backgroundColor: theme.primary,
+      paddingVertical: 15,
+      paddingHorizontal: 50,
+      borderRadius: 15,
+      width: "80%",
+      alignItems: "center",
+      marginBottom: 10,
+    },
+    editButtonText: {
+      color: theme.surface,
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    buttonContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      width: "100%",
+      marginVertical: 20,
+    },
+    signOutButton: {
+      backgroundColor: theme.surface,
+      paddingVertical: 15,
+      paddingHorizontal: 50,
+      borderRadius: 15,
+      width: "80%",
+      alignItems: "center",
+      borderWidth: 1.5,
+      borderColor: theme.primary,
+    },
+    signOutButtonText: {
+      color: theme.primary,
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    message: {
+      fontSize: 18,
+      color: theme.secondaryText,
+      textAlign: "center",
+      marginTop: 20,
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: theme.modalBackground,
+    },
+    modalContent: {
+      backgroundColor: theme.surface,
+      borderRadius: 20,
+      padding: 20,
+      width: "90%",
+      alignItems: "center",
+    },
+    modalTitle: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: theme.text,
+      marginBottom: 10,
+    },
+    passwordContainer: {
+      width: "100%",
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: theme.surface,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: theme.border,
+      marginBottom: 15,
+    },
+    passwordInput: {
+      flex: 1,
+      paddingVertical: 15,
+      paddingHorizontal: 10,
+      color: theme.text,
+    },
+    passwordSubText: {
+      fontSize: 14,
+      color: theme.secondaryText,
+      textAlign: "center",
+      marginBottom: 20,
+    },
+    modalButtons: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      width: "100%",
+      marginTop: 20,
+    },
+    saveButton: {
+      backgroundColor: theme.primary,
+      padding: 15,
+      borderRadius: 10,
+      width: "48%",
+    },
+    cancelButton: {
+      backgroundColor: theme.border,
+      padding: 15,
+      borderRadius: 10,
+      width: "48%",
+    },
+    saveButtonText: {
+      color: theme.surface,
+      textAlign: "center",
+      fontWeight: "bold",
+    },
+    cancelButtonText: {
+      color: theme.text,
+      textAlign: "center",
+      fontWeight: "bold",
+    },
+    errorText: {
+      color: theme.error,
+      marginBottom: 10,
+    },
+    eyeIcon: {
+      paddingHorizontal: 10,
+    },
+    successIcon: {
+      width: 100,
+      height: 100,
+      marginBottom: 20,
+    },
+    successTitle: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: theme.primary,
+      marginBottom: 10,
+    },
+    successText: {
+      fontSize: 16,
+      color: theme.secondaryText,
+      textAlign: "center",
+      marginBottom: 20,
+    },
+    continueButton: {
+      backgroundColor: theme.primary,
+      paddingVertical: 15,
+      paddingHorizontal: 30,
+      borderRadius: 10,
+      width: "100%",
+    },
+    continueButtonText: {
+      color: theme.surface,
+      textAlign: "center",
+      fontWeight: "bold",
+    },
+    editOptionsContainer: {
+      flex: 1,
+      justifyContent: "flex-end",
+      backgroundColor: theme.modalBackground,
+    },
+    editOptionsContent: {
+      backgroundColor: theme.surface,
+      padding: 20,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+    },
+    editOptionButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      padding: 15,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.border,
+    },
+    editOptionText: {
+      marginLeft: 15,
+      fontSize: 16,
+      color: theme.text,
+    },
+  });
 
   useEffect(() => {
     const auth = getAuth();
@@ -109,6 +344,15 @@ const Profile = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth); // Triggers auth state to change
+      navigation.navigate("auth/Login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   if (loading) {
     return <ActivityIndicator size="large" color="#00ADB5" />;
   }
@@ -126,12 +370,12 @@ const Profile = () => {
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("screens/Dashboard")}
+            onPress={() => navigation.goBack()}
           >
             <Ionicons name="arrow-back" size={36} color="#344950" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Profile</Text>
-          <View style={{ width: 36 }} /> {/* Spacer for alignment */}
+          <View style={{ width: 36 }} /> 
         </View>
         <Text style={styles.message}>No user is logged in.</Text>
       </View>
@@ -265,32 +509,29 @@ const Profile = () => {
       visible={showEditOptions}
       onRequestClose={() => setShowEditOptions(false)}
     >
-      
-        <View style={styles.editOptionsContainer}>
-          <View style={styles.editOptionsContent}>
-            <TouchableOpacity
-              style={styles.editOptionButton}
-              onPress={() => {
-                setShowPasswordModal(true);
-                setShowEditOptions(false);
-              }}
-            >
-              <Ionicons name="key-outline" size={24} color="#344950" />
-              <Text style={styles.editOptionText}>Change Password</Text>
-            </TouchableOpacity>
-            
+      <View style={styles.editOptionsContainer}>
+        <View style={styles.editOptionsContent}>
+          <TouchableOpacity
+            style={styles.editOptionButton}
+            onPress={() => {
+              setShowPasswordModal(true);
+              setShowEditOptions(false);
+            }}
+          >
+            <Ionicons name="key-outline" size={24} color="#344950" />
+            <Text style={styles.editOptionText}>Change Password</Text>
+          </TouchableOpacity>
 
-            {/* Add more edit options here */}
+          {/* Add more edit options here */}
 
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setShowEditOptions(false)}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => setShowEditOptions(false)}
+          >
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
         </View>
-
+      </View>
     </Modal>
   );
 
@@ -335,247 +576,21 @@ const Profile = () => {
       </View>
 
       {/* Action Buttons */}
-      <TouchableOpacity
-        style={styles.editButton}
-        onPress={() => setShowEditOptions(true)}
-      >
-        <Text style={styles.editButtonText}>Edit Profile</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.signOutButton}
-        onPress={() => navigation.navigate("auth/Login")}
-      >
-        <Text style={styles.signOutButtonText}>Sign Out</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => setShowEditOptions(true)}
+        >
+          <Text style={styles.editButtonText}>Edit Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+          <Text style={styles.signOutButtonText}>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
       <EditOptionsModal />
       <PasswordChangeModal />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F7F9FC",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 20,
-    backgroundColor: "#FFFFFF",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#344950",
-  },
-  profileContainer: {
-    alignItems: "center",
-    padding: 20,
-  },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 20,
-    borderWidth: 3,
-    borderColor: "#00ADB5",
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#344950",
-    marginBottom: 5,
-  },
-  email: {
-    fontSize: 16,
-    color: "#707070",
-    marginBottom: 20,
-  },
-  detailsContainer: {
-    width: "100%",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
-  },
-  detailItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  detailText: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: "#344950",
-  },
-  editButton: {
-    backgroundColor: "#00ADB5",
-    paddingVertical: 15,
-    paddingHorizontal: 50,
-    borderRadius: 15,
-    width: "80%",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  editButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  signOutButton: {
-    backgroundColor: "#B9ECEE",
-    paddingVertical: 15,
-    paddingHorizontal: 50,
-    borderRadius: 15,
-    width: "80%",
-    alignItems: "center",
-    borderWidth: 1.5,
-    borderColor: "#00ADB5",
-  },
-  signOutButtonText: {
-    color: "#00ADB5",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  message: {
-    fontSize: 18,
-    color: "#707070",
-    textAlign: "center",
-    marginTop: 20,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 20,
-    width: "90%",
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#344950",
-    marginBottom: 10,
-  },
-  passwordContainer: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-    marginBottom: 15,
-  },
-  passwordInput: {
-    flex: 1,
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    color: "#4F4F4F",
-  },
-  passwordSubText: {
-    fontSize: 14,
-    color: "#4F4F4F",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginTop: 20,
-  },
-  saveButton: {
-    backgroundColor: "#00ADB5",
-    padding: 15,
-    borderRadius: 10,
-    width: "48%",
-  },
-  cancelButton: {
-    backgroundColor: "#E0E0E0",
-    padding: 15,
-    borderRadius: 10,
-    width: "48%",
-  },
-  saveButtonText: {
-    color: "#FFFFFF",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  cancelButtonText: {
-    color: "#344950",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  errorText: {
-    color: "red",
-    marginBottom: 10,
-  },
-  eyeIcon: {
-    paddingHorizontal: 10,
-  },
-  successIcon: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
-  },
-  successTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#00ADB5",
-    marginBottom: 10,
-  },
-  successText: {
-    fontSize: 16,
-    color: "#4F4F4F",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  continueButton: {
-    backgroundColor: "#00ADB5",
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    width: "100%",
-  },
-  continueButtonText: {
-    color: "#FFFFFF",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  editOptionsContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  editOptionsContent: {
-    backgroundColor: "#FFFFFF",
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  editOptionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  editOptionText: {
-    marginLeft: 15,
-    fontSize: 16,
-    color: "#344950",
-  },
-});
 
 export default Profile;
