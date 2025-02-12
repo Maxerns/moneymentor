@@ -15,13 +15,36 @@ import { useTheme } from "../context/ThemeContext";
 import ModuleContent from "../screens/ModuleContent";
 import LearningPath from "../screens/LearningPath";
 import Tools from "../screens/Tools";
+import LinkBankScreen from "../screens/LinkBankScreen";
 
 const Stack = createStackNavigator<RootStackParamList>();
+
+const linking = {
+  prefixes: ["moneymentor://"],
+  config: {
+    screens: {
+      "screens/Landing": "",
+      "auth/SignUp": "signup",
+      "auth/Login": "login",
+      "screens/Dashboard": "dashboard",
+      "screens/Learning": "learning",
+      "screens/FinancialTermGlossary": "glossary",
+      "screens/TaxEstimatorTool": "tax",
+      "screens/Profile": "profile",
+      "screens/Settings": "settings",
+      "screens/ModuleContent": "module",
+      "screens/LearningPath": "learningpath",
+      "screens/Tools": "tools",
+      "screens/LinkBankScreen": "linkbank",
+    },
+  },
+};
 
 const Navigator = () => {
   const { theme, isDark } = useTheme();
   return (
     <NavigationContainer
+      linking={linking}
       theme={{
         dark: isDark,
         colors: {
@@ -34,20 +57,20 @@ const Navigator = () => {
         },
         fonts: {
           regular: {
-            fontFamily: 'System',
-            fontWeight: 'normal',
+            fontFamily: "System",
+            fontWeight: "normal",
           },
           medium: {
-            fontFamily: 'System',
-            fontWeight: 'normal',
+            fontFamily: "System",
+            fontWeight: "normal",
           },
           bold: {
-            fontFamily: 'System',
-            fontWeight: 'bold',
+            fontFamily: "System",
+            fontWeight: "bold",
           },
           heavy: {
-            fontFamily: 'System',
-            fontWeight: 'bold',
+            fontFamily: "System",
+            fontWeight: "bold",
           },
         },
       }}
@@ -74,6 +97,10 @@ const Navigator = () => {
         <Stack.Screen name="screens/ModuleContent" component={ModuleContent} />
         <Stack.Screen name="screens/LearningPath" component={LearningPath} />
         <Stack.Screen name="screens/Tools" component={Tools} />
+        <Stack.Screen
+          name="screens/LinkBankScreen"
+          component={LinkBankScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

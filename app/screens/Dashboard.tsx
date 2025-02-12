@@ -12,14 +12,17 @@ import {
   Dimensions,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useNavigation, NavigationProp, ThemeContext } from "@react-navigation/native";
+import {
+  useNavigation,
+  NavigationProp,
+  ThemeContext,
+} from "@react-navigation/native";
 import { RootStackParamList } from "../../.expo/types/types";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { LineChart } from "react-native-chart-kit";
 import { useTheme } from "../context/ThemeContext";
-
 
 interface FinancialValue {
   value: number;
@@ -35,6 +38,7 @@ export default function DashboardPage() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [budgetHistory, setBudgetHistory] = useState<BudgetHistory[]>([]);
   const [isGuest, setIsGuest] = useState(true);
+  const [linkedBank, setLinkedBank] = useState(false);
   const { theme } = useTheme();
 
   const styles = StyleSheet.create({
@@ -207,6 +211,21 @@ export default function DashboardPage() {
       textAlign: "center",
       fontWeight: "bold",
     },
+    linkBankButton: {
+      backgroundColor: theme.primary,
+      padding: 15,
+      borderRadius: 10,
+      width: "100%",
+      alignItems: "center",
+      flexDirection: "row",
+      justifyContent: "center",
+    },
+    linkBankText: {
+      color: theme.surface,
+      fontSize: 16,
+      fontWeight: "bold",
+      marginLeft: 10,
+    },
   });
 
   // Initialize with 0 values
@@ -224,6 +243,19 @@ export default function DashboardPage() {
   });
 
   const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadBankStatus = async () => {
+      if (auth.currentUser) {
+        const docRef = doc(db, "users", auth.currentUser.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setLinkedBank(!!docSnap.data().bankAccessToken);
+        }
+      }
+    };
+    loadBankStatus();
+  }, []);
 
   // Load user data on component mount and check auth state
   useEffect(() => {
@@ -250,25 +282,29 @@ export default function DashboardPage() {
     try {
       const docRef = doc(db, "users", uid);
       const docSnap = await getDoc(docRef);
-
+  
       if (docSnap.exists()) {
         const data = docSnap.data();
-        console.log("Loaded data:", data);
-
+        
+        // Update linked bank status
+        setLinkedBank(!!data.linkedBank);
+  
+        // Set budget from bank data if available
         if (data.budget) {
           setBudget({
             value: data.budget.value,
             isSet: data.budget.isSet,
           });
         }
-
+  
+        // Load other financial data
         if (data.savings) {
           setSavings({
             value: data.savings.value,
             isSet: data.savings.isSet,
           });
         }
-
+  
         if (data.debt) {
           setDebt({
             value: data.debt.value,
@@ -413,6 +449,21 @@ export default function DashboardPage() {
       </View>
 
       {/* Budget Section */}
+
+      {!linkedBank && (
+        <TouchableOpacity
+          style={styles.linkBankButton}
+          onPress={() => navigation.navigate("screens/LinkBankScreen")}
+        >
+          <MaterialIcons
+            name="account-balance"
+            size={24}
+            color={theme.primary}
+          />
+          <Text style={styles.linkBankText}>Link Your Bank Account</Text>
+        </TouchableOpacity>
+      )}
+
       <View style={styles.budgetContainer}>
         <Text style={styles.budgetTitle}>Budget</Text>
         <View style={styles.valueContainer}>
@@ -598,5 +649,3 @@ export default function DashboardPage() {
     </View>
   );
 }
-
-
