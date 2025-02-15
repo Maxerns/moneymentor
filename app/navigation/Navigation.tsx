@@ -15,6 +15,7 @@ import { useTheme } from "../context/ThemeContext";
 import ModuleContent from "../screens/ModuleContent";
 import LearningPath from "../screens/LearningPath";
 import Tools from "../screens/Tools";
+import BudgetManagementTool from "../screens/BudgetManagementTool";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -74,6 +75,7 @@ const Navigator = () => {
         <Stack.Screen name="screens/ModuleContent" component={ModuleContent} />
         <Stack.Screen name="screens/LearningPath" component={LearningPath} />
         <Stack.Screen name="screens/Tools" component={Tools} />
+        <Stack.Screen name="screens/BudgetManagementTool" component={BudgetManagementTool} />
       </Stack.Navigator>
     </NavigationContainer>
   );
