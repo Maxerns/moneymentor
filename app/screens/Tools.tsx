@@ -18,7 +18,9 @@ interface ToolType {
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
   route: Extract<
     keyof RootStackParamList,
-    "screens/FinancialTermGlossary" | "screens/TaxEstimatorTool"
+    | "screens/FinancialTermGlossary"
+    | "screens/TaxEstimatorTool"
+    | "screens/BudgetManagementTool"
   >;
 }
 
@@ -27,6 +29,12 @@ export default function Tools() {
   const { theme } = useTheme();
 
   const tools: ToolType[] = [
+    {
+      title: "Budget Management",
+      description: "Track and manage your monthly budget and expenses",
+      icon: "wallet" as keyof typeof MaterialCommunityIcons.glyphMap,
+      route: "screens/BudgetManagementTool",
+    },
     {
       title: "Financial Term Glossary",
       description: "Comprehensive guide to financial terminology and concepts",
