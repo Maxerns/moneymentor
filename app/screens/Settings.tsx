@@ -7,14 +7,18 @@ import {
   Switch,
   ScrollView,
   Modal,
+  Alert,
+  Pressable,
+  Button,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../.expo/types/types";
 import { useTheme } from "../context/ThemeContext";
-import { deleteUser } from "firebase/auth";
+import { deleteUser, getAuth } from "firebase/auth";
 import { doc, deleteDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase/config";
+import { generateTestData } from "../utils/generateTestData";
 
 export default function Settings() {
   // Navigation hook for screen navigation
@@ -31,6 +35,9 @@ export default function Settings() {
 
   // Theme context
   const { theme, isDark, toggleTheme } = useTheme();
+
+  const [devModeEnabled, setDevModeEnabled] = useState(false);
+  const [tapCount, setTapCount] = useState(0);
 
   const styles = StyleSheet.create({
     container: {
@@ -158,6 +165,63 @@ export default function Settings() {
       marginBottom: 10,
     },
   });
+
+  const handleVersionPress = () => {
+    const newCount = tapCount + 1;
+    setTapCount(newCount);
+
+    if (newCount >= 7) {
+      setDevModeEnabled(true);
+      Alert.alert(
+        "Developer Mode Enabled",
+        "Test functions are now available."
+      );
+      setTapCount(0);
+    }
+  };
+
+  const runDataStressTest = async () => {
+    try {
+      const auth = getAuth();
+      const userId = auth.currentUser?.uid;
+
+      if (!userId) {
+        Alert.alert("Error", "You must be logged in to run the test");
+        return;
+      }
+
+      Alert.alert("Generate Test Data", "How many transactions to generate?", [
+        {
+          text: "100",
+          onPress: () => generateAndNotify(userId, 100),
+        },
+        {
+          text: "500",
+          onPress: () => generateAndNotify(userId, 500),
+        },
+        {
+          text: "1000",
+          onPress: () => generateAndNotify(userId, 1000),
+          style: "destructive",
+        },
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+      ]);
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        error instanceof Error ? error.message : "An unexpected error occurred"
+      );
+    }
+  };
+
+  const generateAndNotify = async (userId: string, count: number) => {
+    Alert.alert("Generating Data", `Creating ${count} transactions...`);
+    await generateTestData(userId, count);
+    Alert.alert("Success", `${count} test transactions added to your account`);
+  };
 
   // Handler for account deletion
   const handleDeleteAccount = async () => {
@@ -394,6 +458,20 @@ export default function Settings() {
         </View>
       </ScrollView>
       <DeleteConfirmModal />
+
+      <Pressable onPress={handleVersionPress}>
+        <Text>Version 1.0.0</Text>
+      </Pressable>
+
+      {devModeEnabled && (
+        <View
+          style={{ marginTop: 20, padding: 10, backgroundColor: "#FFF3CD" }}
+        >
+          <Text style={{ fontWeight: "bold" }}>Developer Tools</Text>
+          <Button title="Generate Test Data" onPress={runDataStressTest} />
+          {/* Add more test buttons here */}
+        </View>
+      )}
     </View>
   );
 }
