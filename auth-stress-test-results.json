@@ -1,0 +1,134 @@
+{
+  "signIn": [
+    {
+      "email": "stresstest_8778229@test.com",
+      "duration": 475,
+      "success": true
+    },
+    {
+      "email": "stresstest_5686585@test.com",
+      "duration": 342,
+      "success": true
+    },
+    {
+      "email": "stresstest_3440312@test.com",
+      "duration": 479,
+      "success": true
+    },
+    {
+      "email": "stresstest_8056036@test.com",
+      "duration": 482,
+      "success": true
+    },
+    {
+      "email": "stresstest_2280335@test.com",
+      "duration": 478,
+      "success": true
+    }
+  ],
+  "signUp": [
+    {
+      "email": "stresstest_8778229@test.com",
+      "duration": 999,
+      "success": true
+    },
+    {
+      "email": "stresstest_5686585@test.com",
+      "duration": 648,
+      "success": true
+    },
+    {
+      "email": "stresstest_3440312@test.com",
+      "duration": 806,
+      "success": true
+    },
+    {
+      "email": "stresstest_8056036@test.com",
+      "duration": 1436,
+      "success": true
+    },
+    {
+      "email": "stresstest_2280335@test.com",
+      "duration": 950,
+      "success": true
+    },
+    {
+      "email": "stresstest_4156583@test.com",
+      "duration": 635,
+      "success": true
+    },
+    {
+      "email": "stresstest_2952783@test.com",
+      "duration": 645,
+      "success": true
+    },
+    {
+      "email": "stresstest_8489732@test.com",
+      "duration": 947,
+      "success": true
+    },
+    {
+      "email": "stresstest_1019539@test.com",
+      "duration": 670,
+      "success": true
+    },
+    {
+      "email": "stresstest_9280361@test.com",
+      "duration": 786,
+      "success": true
+    }
+  ],
+  "passwordReset": [
+    {
+      "email": "stresstest_8778229@test.com",
+      "duration": 614,
+      "success": true
+    },
+    {
+      "email": "stresstest_5686585@test.com",
+      "duration": 645,
+      "success": true
+    },
+    {
+      "email": "stresstest_3440312@test.com",
+      "duration": 478,
+      "success": true
+    },
+    {
+      "email": "stresstest_8056036@test.com",
+      "duration": 635,
+      "success": true
+    },
+    {
+      "email": "stresstest_2280335@test.com",
+      "duration": 485,
+      "success": true
+    }
+  ],
+  "concurrentRequests": [
+    {
+      "type": "signIn",
+      "totalRequests": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "totalDuration": 343,
+      "averageDuration": 343
+    },
+    {
+      "type": "signIn",
+      "totalRequests": 5,
+      "successCount": 5,
+      "failureCount": 0,
+      "totalDuration": 454,
+      "averageDuration": 90.8
+    },
+    {
+      "type": "signIn",
+      "totalRequests": 10,
+      "successCount": 10,
+      "failureCount": 0,
+      "totalDuration": 524,
+      "averageDuration": 52.4
+    }
+  ]
+}
