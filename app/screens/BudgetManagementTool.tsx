@@ -35,7 +35,7 @@ export const categoryIcons: Record<string, IconName> = {
 
 const defaultCategories = [
   {
-    name: "Housing",
+    name: "Rent",
     icon: categoryIcons.Housing,
     color: "#FF6B6B",
     limit: 0,

@@ -9,6 +9,7 @@ import Dashboard from "../screens/Dashboard";
 import Learning from "../screens/Learning";
 import FinancialTermGlossary from "../screens/FinancialTermGlossary";
 import TaxEstimatorTool from "../screens/TaxEstimatorTool";
+import BudgetManagementTool from "../screens/BudgetManagementTool";
 import Profile from "../screens/Profile";
 import Settings from "../screens/Settings";
 import { useTheme } from "../context/ThemeContext";
@@ -70,6 +71,7 @@ const Navigator = () => {
           name="screens/TaxEstimatorTool"
           component={TaxEstimatorTool}
         />
+        <Stack.Screen name="screens/BudgetManagementTool" component={BudgetManagementTool} />
         <Stack.Screen name="screens/Profile" component={Profile} />
         <Stack.Screen name="screens/Settings" component={Settings} />
         <Stack.Screen name="screens/ModuleContent" component={ModuleContent} />

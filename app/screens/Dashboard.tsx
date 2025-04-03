@@ -9,17 +9,21 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Dimensions,
+  ScrollView,
 } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useNavigation, NavigationProp, ThemeContext } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../.expo/types/types";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
-import { LineChart } from "react-native-chart-kit";
 import { useTheme } from "../context/ThemeContext";
-
+import { LineChartComponent } from "../components/charts/LineChartComponent";
+import { Card } from "../components/ui/Card";
+import { Button } from "../components/ui/Button";
+import { ScreenHeader } from "../components/layout/ScreenHeader";
+import { BottomNavBar } from "../components/layout/BottomNavBar";
+import { FormInput } from "../components/forms/FormInput";
 
 interface FinancialValue {
   value: number;
@@ -31,185 +35,16 @@ interface BudgetHistory {
   date: string;
 }
 
-export default function DashboardPage() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+export default function DashboardPage({
+  navigation,
+}: {
+  navigation: NavigationProp<RootStackParamList>;
+}) {
   const [budgetHistory, setBudgetHistory] = useState<BudgetHistory[]>([]);
   const [isGuest, setIsGuest] = useState(true);
   const { theme } = useTheme();
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.background,
-      paddingHorizontal: 20,
-    },
-    chartContainer: {
-      width: "100%",
-      height: 200,
-      backgroundColor: theme.background,
-      borderRadius: 10,
-      marginTop: 10,
-    },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginTop: 40,
-      marginBottom: 20,
-    },
-    logo: {
-      width: 75,
-      height: 75,
-      alignItems: "center",
-      marginBottom: 0,
-    },
-    budgetContainer: {
-      backgroundColor: theme.background,
-      borderRadius: 10,
-      padding: 20,
-      alignItems: "center",
-      marginBottom: 20,
-    },
-    budgetTitle: {
-      fontSize: 18,
-      fontWeight: 500,
-      color: theme.text,
-    },
-    budgetValue: {
-      fontSize: 32,
-      fontWeight: "bold",
-      color: theme.text,
-      marginVertical: 10,
-    },
-    chartPlaceholder: {
-      width: "100%",
-      height: 100,
-      backgroundColor: theme.chart,
-      borderRadius: 10,
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    chartText: {
-      color: theme.text,
-      fontSize: 14,
-    },
-    cardsContainer: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-    },
-    card: {
-      flex: 1,
-      backgroundColor: theme.background,
-      borderRadius: 10,
-      padding: 25,
-      margin: 50,
-      marginHorizontal: 5,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    learningCardContainer: {
-      alignItems: "center",
-    },
-    learningCard: {
-      width: "100%",
-      backgroundColor: theme.background,
-      borderRadius: 10,
-      padding: 25,
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    cardTitle: {
-      fontSize: 16,
-      fontWeight: 500,
-      color: theme.text,
-      marginVertical: 5,
-    },
-    cardValue: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: theme.text,
-      opacity: 0.7,
-    },
-    navBar: {
-      position: "absolute",
-      bottom: 0,
-      width: "115%",
-      left: 0,
-      right: 0,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      backgroundColor: theme.background,
-      paddingVertical: 10,
-      paddingHorizontal: 40,
-    },
-    navBarIcon: {
-      fontSize: 30,
-      color: theme.icon,
-    },
-    navText: {
-      fontSize: 12,
-      fontWeight: 500,
-      color: theme.text,
-      marginTop: 5,
-    },
-    valueContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-    },
-    modalContainer: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: theme.background,
-    },
-    modalContent: {
-      backgroundColor: theme.background,
-      padding: 20,
-      borderRadius: 10,
-      width: "80%",
-    },
-    modalTitle: {
-      fontSize: 18,
-      fontWeight: "bold",
-      marginBottom: 15,
-      textAlign: "center",
-    },
-    modalInput: {
-      borderWidth: 1,
-      borderColor: theme.border,
-      borderRadius: 5,
-      padding: 10,
-      marginBottom: 15,
-    },
-    modalButtons: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-    },
-    modalButton: {
-      padding: 10,
-      borderRadius: 5,
-      width: "40%",
-    },
-    saveButton: {
-      backgroundColor: theme.background,
-    },
-    cancelButton: {
-      backgroundColor: theme.background,
-    },
-    modalButtonText: {
-      color: theme.text,
-      textAlign: "center",
-      fontWeight: "bold",
-    },
-  });
-
-  // Initialize with 0 values
   const [budget, setBudget] = useState<FinancialValue>({
     value: 0,
     isSet: false,
@@ -223,9 +58,12 @@ export default function DashboardPage() {
     isSet: false,
   });
 
-  const [userId, setUserId] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [activeField, setActiveField] = useState<
+    "budget" | "savings" | "debt" | null
+  >(null);
+  const [tempValue, setTempValue] = useState("");
 
-  // Load user data on component mount and check auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -240,12 +78,6 @@ export default function DashboardPage() {
     return () => unsubscribe();
   }, []);
 
-  const getMonthName = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString("default", { month: "short" });
-  };
-
-  // Load user financial data from Firestore
   const loadUserData = async (uid: string) => {
     try {
       const docRef = doc(db, "users", uid);
@@ -284,7 +116,6 @@ export default function DashboardPage() {
     }
   };
 
-  // Save user financial data to Firestore
   const saveUserData = async (
     field: "budget" | "savings" | "debt",
     value: number
@@ -297,11 +128,9 @@ export default function DashboardPage() {
 
       let updateData = {};
       if (docSnap.exists()) {
-        // Keep existing data
         updateData = docSnap.data();
       }
 
-      // Update specific field
       updateData = {
         ...updateData,
         [field]: {
@@ -310,20 +139,12 @@ export default function DashboardPage() {
         },
       };
 
-      // Save to Firebase
       await setDoc(docRef, updateData);
       console.log("Data saved successfully");
     } catch (error) {
       console.error("Error saving user data:", error);
     }
   };
-
-  // Modal states
-  const [modalVisible, setModalVisible] = useState(false);
-  const [activeField, setActiveField] = useState<
-    "budget" | "savings" | "debt" | null
-  >(null);
-  const [tempValue, setTempValue] = useState("");
 
   const handleEdit = (field: "budget" | "savings" | "debt") => {
     setActiveField(field);
@@ -353,7 +174,6 @@ export default function DashboardPage() {
         const updatedHistory = [...budgetHistory, newHistoryEntry];
         setBudgetHistory(updatedHistory);
 
-        // Save to Firebase
         const docRef = doc(db, "users", userId!);
         await setDoc(
           docRef,
@@ -386,218 +206,283 @@ export default function DashboardPage() {
     }
   };
 
+  const getMonthName = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("default", { month: "short" });
+  };
+
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity>
-          <Ionicons
-            name="person-circle-outline"
-            size={36}
-            color="#344950"
-            onPress={() => navigation.navigate("screens/Profile")}
-          />
-        </TouchableOpacity>
-        <Image
-          source={require("../../assets/images/MoneyMentorLogoGradient.png")}
-          style={styles.logo}
-        />
-        <TouchableOpacity>
-          <Ionicons
-            name="settings-outline"
-            size={36}
-            color="#344950"
-            onPress={() => navigation.navigate("screens/Settings")}
-          />
-        </TouchableOpacity>
-      </View>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <ScreenHeader />
 
-      {/* Budget Section */}
-      <View style={styles.budgetContainer}>
-        <Text style={styles.budgetTitle}>Budget</Text>
-        <View style={styles.valueContainer}>
-          {budget.isSet ? (
-            <>
-              <Text style={styles.budgetValue}>£{budget.value.toFixed(2)}</Text>
-              <TouchableOpacity onPress={() => handleEdit("budget")}>
-                <MaterialIcons name="edit" size={24} color="#344950" />
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <Text style={styles.budgetValue}>£0.00</Text>
-              <TouchableOpacity onPress={() => handleEdit("budget")}>
-                <MaterialIcons name="add-circle" size={24} color="#344950" />
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
-        {!isGuest && budgetHistory.length > 0 && (
-          <View style={styles.chartContainer}>
-            <LineChart
-              data={{
-                labels: budgetHistory.map((entry) => getMonthName(entry.date)),
-                datasets: [
-                  {
-                    data: budgetHistory.map((entry) => entry.amount),
-                  },
-                ],
-              }}
-              width={Dimensions.get("window").width - 60}
-              height={200}
-              withHorizontalLines={false}
-              withVerticalLines={false}
-              chartConfig={{
-                backgroundColor: "transparent",
-                backgroundGradientFrom: "#E0F7FA",
-                backgroundGradientTo: "#E0F7FA",
-                decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(52, 73, 80, ${opacity})`,
-                style: {
-                  borderRadius: 16,
-                },
-              }}
-              bezier
-              style={{
-                marginVertical: 8,
-                borderRadius: 16,
-              }}
-            />
-          </View>
-        )}
-      </View>
-
-      {/* Cards Section */}
-      <View style={styles.cardsContainer}>
-        <View style={styles.card}>
-          <MaterialIcons name="savings" size={24} color="#344950" />
-          <Text style={styles.cardTitle}>Savings</Text>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        <Card style={styles.budgetContainer}>
+          <Text style={[styles.budgetTitle, { color: theme.text }]}>
+            Budget
+          </Text>
           <View style={styles.valueContainer}>
-            {savings.isSet ? (
+            {budget.isSet ? (
               <>
-                <Text style={styles.cardValue}>
-                  £{savings.value.toFixed(2)}
+                <Text style={[styles.budgetValue, { color: theme.text }]}>
+                  £{budget.value.toFixed(2)}
                 </Text>
-                <TouchableOpacity onPress={() => handleEdit("savings")}>
-                  <MaterialIcons name="edit" size={20} color="#344950" />
+                <TouchableOpacity onPress={() => handleEdit("budget")}>
+                  <MaterialIcons name="edit" size={24} color={theme.icon} />
                 </TouchableOpacity>
               </>
             ) : (
               <>
-                <Text style={styles.cardValue}>£0.00</Text>
-                <TouchableOpacity onPress={() => handleEdit("savings")}>
-                  <MaterialIcons name="add-circle" size={24} color="#344950" />
+                <Text style={[styles.budgetValue, { color: theme.text }]}>
+                  £0.00
+                </Text>
+                <TouchableOpacity onPress={() => handleEdit("budget")}>
+                  <MaterialIcons
+                    name="add-circle"
+                    size={24}
+                    color={theme.icon}
+                  />
                 </TouchableOpacity>
               </>
             )}
           </View>
-        </View>
-        <View style={styles.card}>
-          <MaterialIcons name="credit-card" size={24} color="#344950" />
-          <Text style={styles.cardTitle}>Debts</Text>
-          <View style={styles.valueContainer}>
-            {debt.isSet ? (
-              <>
-                <Text style={styles.cardValue}>£{debt.value.toFixed(2)}</Text>
-                <TouchableOpacity onPress={() => handleEdit("debt")}>
-                  <MaterialIcons name="edit" size={20} color="#344950" />
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <Text style={styles.cardValue}>£0.00</Text>
-                <TouchableOpacity onPress={() => handleEdit("debt")}>
-                  <MaterialIcons name="add-circle" size={24} color="#344950" />
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </View>
-      </View>
 
-      {/* Edit Modal */}
+          {!isGuest && budgetHistory.length > 0 && (
+            <View
+              style={[
+                styles.chartContainer,
+                { backgroundColor: theme.background },
+              ]}
+            >
+              <LineChartComponent
+                data={{
+                  labels: budgetHistory.map((entry) =>
+                    getMonthName(entry.date)
+                  ),
+                  datasets: [
+                    {
+                      data: budgetHistory.map((entry) => entry.amount),
+                    },
+                  ],
+                }}
+                height={200}
+                withDots={false}
+                withInnerLines={false}
+                withOuterLines={false}
+              />
+            </View>
+          )}
+        </Card>
+
+        <View style={styles.cardsContainer}>
+          <Card style={styles.card}>
+            <Text style={[styles.cardTitle, { color: theme.text }]}>
+              Savings
+            </Text>
+            <View style={styles.valueContainer}>
+              {savings.isSet ? (
+                <>
+                  <Text style={[styles.cardValue, { color: theme.text }]}>
+                    £{savings.value.toFixed(2)}
+                  </Text>
+                  <TouchableOpacity onPress={() => handleEdit("savings")}>
+                    <MaterialIcons name="edit" size={24} color={theme.icon} />
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <Text style={[styles.cardValue, { color: theme.text }]}>
+                    £0.00
+                  </Text>
+                  <TouchableOpacity onPress={() => handleEdit("savings")}>
+                    <MaterialIcons
+                      name="add-circle"
+                      size={24}
+                      color={theme.icon}
+                    />
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </Card>
+
+          <Card style={styles.card}>
+            <Text style={[styles.cardTitle, { color: theme.text }]}>Debt</Text>
+            <View style={styles.valueContainer}>
+              {debt.isSet ? (
+                <>
+                  <Text style={[styles.cardValue, { color: theme.text }]}>
+                    £{debt.value.toFixed(2)}
+                  </Text>
+                  <TouchableOpacity onPress={() => handleEdit("debt")}>
+                    <MaterialIcons name="edit" size={24} color={theme.icon} />
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <Text style={[styles.cardValue, { color: theme.text }]}>
+                    £0.00
+                  </Text>
+                  <TouchableOpacity onPress={() => handleEdit("debt")}>
+                    <MaterialIcons
+                      name="add-circle"
+                      size={24}
+                      color={theme.icon}
+                    />
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </Card>
+        </View>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate("screens/Learning")}
+          style={styles.learningCardContainer}
+        >
+          <Card style={styles.learningCard}>
+            <MaterialIcons name="create" size={24} color={theme.icon} />
+            <Text style={[styles.cardTitle, { color: theme.text }]}>
+              Learning
+            </Text>
+          </Card>
+        </TouchableOpacity>
+      </ScrollView>
+
       <Modal
-        animationType="slide"
-        transparent={true}
         visible={modalVisible}
+        transparent={true}
+        animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.modalContainer}
         >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {activeField
-                ? `Enter ${
-                    activeField.charAt(0).toUpperCase() + activeField.slice(1)
-                  } Amount`
-                : ""}
+          <View
+            style={[styles.modalContent, { backgroundColor: theme.surface }]}
+          >
+            <Text style={[styles.modalTitle, { color: theme.text }]}>
+              {activeField === "budget"
+                ? "Update Budget"
+                : activeField === "savings"
+                ? "Update Savings"
+                : "Update Debt"}
             </Text>
-            <TextInput
-              style={styles.modalInput}
+
+            <FormInput
               keyboardType="decimal-pad"
               value={tempValue}
               onChangeText={setTempValue}
               placeholder="Enter amount"
-              placeholderTextColor="#B0BEC5"
             />
+
             <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
+              <Button
+                title="Cancel"
+                variant="secondary"
                 onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.saveButton]}
+                style={styles.cancelButton}
+              />
+              <Button
+                title="Save"
                 onPress={handleSave}
-              >
-                <Text style={styles.modalButtonText}>Save</Text>
-              </TouchableOpacity>
+                style={styles.saveButton}
+              />
             </View>
           </View>
         </KeyboardAvoidingView>
       </Modal>
 
-      {/* Learning Card */}
-      <View style={styles.learningCardContainer}>
-        <View style={styles.learningCard}>
-          <MaterialIcons name="create" size={24} color="#344950" />
-          <Text style={styles.cardTitle}>Learning</Text>
-        </View>
-      </View>
-
-      {/* Bottom Navigation */}
-      <View style={styles.navBar}>
-        <TouchableOpacity>
-          <Ionicons name="home-outline" style={styles.navBarIcon} />
-          <Text style={styles.navText}>Dashboard</Text>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Ionicons
-            name="construct-outline"
-            style={styles.navBarIcon}
-            onPress={() => navigation.navigate("screens/Tools")}
-          />
-          <Text style={styles.navText}>Tools</Text>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Ionicons name="analytics-outline" style={styles.navBarIcon} 
-          onPress={() => navigation.navigate("screens/Analytics")}/>
-          <Text style={styles.navText}>Analysis</Text>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Ionicons
-            name="school-outline"
-            style={styles.navBarIcon}
-            onPress={() => navigation.navigate("screens/Learning")}
-          />
-          <Text style={styles.navText}>Learning</Text>
-        </TouchableOpacity>
-      </View>
+      <BottomNavBar />
     </View>
   );
 }
 
-
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  budgetContainer: {
+    paddingVertical: 20,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  budgetTitle: {
+    fontSize: 18,
+    fontWeight: "500",
+  },
+  budgetValue: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginVertical: 10,
+  },
+  chartContainer: {
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  cardsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  card: {
+    flex: 1,
+    marginHorizontal: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginVertical: 5,
+  },
+  cardValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    opacity: 0.7,
+  },
+  learningCardContainer: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+  learningCard: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  valueContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 15,
+  },
+  saveButton: {
+    width: "48%",
+  },
+  cancelButton: {
+    width: "48%",
+  },
+});
