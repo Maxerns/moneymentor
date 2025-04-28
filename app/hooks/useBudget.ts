@@ -63,7 +63,7 @@ export const useBudget = () => {
         );
         setTransactions(sortedTransactions);
       } else {
-        // Initialize new budget if none exists
+        // Initialise new budget if none exists
         const newBudget = {
           categories: [],
           totalBudget: 0,

@@ -19,6 +19,7 @@ export default function FinancialTermGlossary() {
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTerm, setSelectedTerm] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const { theme } = useTheme();
 
   const styles = StyleSheet.create({
@@ -201,11 +202,29 @@ export default function FinancialTermGlossary() {
 
   const handleLetterPress = (letter: string) => {
     setSelectedLetter(letter === selectedLetter ? null : letter);
+    // Clear search when selecting a letter
+    setSearchQuery("");
   };
 
   const handleTermPress = (term: string) => {
     setSelectedTerm(term);
     setModalVisible(true);
+  };
+
+  // Helper function to get all terms from all letters
+  const getAllTerms = () => {
+    const allTerms: { term: string; definition: string; letter: string }[] = [];
+
+    Object.entries(terms).forEach(([letter, termsList]) => {
+      termsList.forEach((termObj) => {
+        allTerms.push({
+          ...termObj,
+          letter,
+        });
+      });
+    });
+
+    return allTerms;
   };
 
   const termSuggestions: {
@@ -389,17 +408,19 @@ export default function FinancialTermGlossary() {
           placeholder="Term search"
           placeholderTextColor="#B0BEC5"
           style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
         />
       </View>
 
       <ScrollView>
-        {Object.keys(terms).map((letter) => (
-          <View key={letter} style={styles.letterSection}>
-            <TouchableOpacity onPress={() => handleLetterPress(letter)}>
-              <Text style={styles.letter}>{letter}</Text>
-            </TouchableOpacity>
-            {selectedLetter === letter &&
-              terms[letter].map(({ term, definition }) => (
+        {searchQuery
+          ? // Show search results
+            getAllTerms()
+              .filter(({ term }) =>
+                term.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .map(({ term, definition, letter }) => (
                 <View key={term} style={styles.termCard}>
                   <Text style={styles.termText}>{term}</Text>
                   <Text style={styles.definition}>{definition}</Text>
@@ -410,9 +431,28 @@ export default function FinancialTermGlossary() {
                     <Text style={styles.learnMoreText}>Learn More</Text>
                   </TouchableOpacity>
                 </View>
-              ))}
-          </View>
-        ))}
+              ))
+          : // Show alphabetical listing
+            Object.keys(terms).map((letter) => (
+              <View key={letter} style={styles.letterSection}>
+                <TouchableOpacity onPress={() => handleLetterPress(letter)}>
+                  <Text style={styles.letter}>{letter}</Text>
+                </TouchableOpacity>
+                {selectedLetter === letter &&
+                  terms[letter].map(({ term, definition }) => (
+                    <View key={term} style={styles.termCard}>
+                      <Text style={styles.termText}>{term}</Text>
+                      <Text style={styles.definition}>{definition}</Text>
+                      <TouchableOpacity
+                        style={styles.learnMoreButton}
+                        onPress={() => handleTermPress(term)}
+                      >
+                        <Text style={styles.learnMoreText}>Learn More</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+              </View>
+            ))}
       </ScrollView>
 
       {/* Term Details Modal */}
