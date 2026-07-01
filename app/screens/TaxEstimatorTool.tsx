@@ -30,7 +30,7 @@ export default function TaxEstimatorTool() {
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
 
   const styles = StyleSheet.create({
     safeArea: {
@@ -459,7 +459,7 @@ export default function TaxEstimatorTool() {
                   key={field}
                   label={field}
                   value={field}
-                  color={theme.isDarkMode ? "#FFFFFF" : "#000000"}
+                  color={isDark ? "#FFFFFF" : "#000000"}
                 />
               ))}
             </Picker>
@@ -480,7 +480,7 @@ export default function TaxEstimatorTool() {
                   key={type}
                   label={type}
                   value={type}
-                  color={theme.isDarkMode ? "#FFFFFF" : "#000000"}
+                  color={isDark ? "#FFFFFF" : "#000000"}
                 />
               ))}
             </Picker>
@@ -551,7 +551,7 @@ export default function TaxEstimatorTool() {
               {getSuggestions().map((suggestion) => (
                 <View key={suggestion.id} style={styles.suggestionItem}>
                   <Ionicons
-                    name={suggestion.icon}
+                    name={suggestion.icon as keyof typeof Ionicons.glyphMap}
                     size={20}
                     color={theme.primary}
                     style={styles.suggestionIcon}

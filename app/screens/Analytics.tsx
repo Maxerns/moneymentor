@@ -14,6 +14,7 @@ import { AssetCard } from "../components/dashboard/AssetCard";
 import { formatTime } from "../components/dashboard/format";
 import { FxCard } from "../components/dashboard/FxCard";
 import { MacroCard } from "../components/dashboard/MacroCard";
+import { MentorCard } from "../components/dashboard/MentorCard";
 import { SectionHeader } from "../components/dashboard/SectionHeader";
 import { WatchlistModal } from "../components/dashboard/WatchlistModal";
 import { BottomNavBar } from "../components/layout/BottomNavBar";
@@ -102,6 +103,9 @@ export default function Analytics() {
   const macro = data?.macro ?? [];
   const fx = data?.fx;
   const partialErrors = data?.errors ?? [];
+  const cpiRate = macro.find((m) => m.id === "uk-cpi")?.latest.value ?? null;
+  const bankRate =
+    macro.find((m) => m.id === "uk-base-rate")?.latest.value ?? null;
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
@@ -142,6 +146,10 @@ export default function Analytics() {
               {partialErrors.map((e) => e.source).join(", ")}
             </Text>
           </View>
+        ) : null}
+
+        {cpiRate != null ? (
+          <MentorCard cpiRate={cpiRate} bankRate={bankRate} />
         ) : null}
 
         {macro.length > 0 ? (
