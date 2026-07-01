@@ -11,5 +11,6 @@
   "include": [
     "**/*.ts",
     "**/*.tsx"
-, "index.js"  ]
+, "index.js"  ],
+  "exclude": ["node_modules", "worker", "dist", ".expo"]
 }

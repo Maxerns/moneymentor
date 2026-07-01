@@ -1,0 +1,37 @@
+{
+  "AAPL": {
+    "symbol": "AAPL",
+    "name": "Apple Inc.",
+    "exchange": "NASDAQ",
+    "currency": "USD",
+    "close": "289.35999",
+    "previous_close": "281.73999",
+    "change": "7.62000",
+    "percent_change": "2.70462",
+    "high": "289.91000",
+    "low": "280.69501",
+    "volume": "64460950",
+    "is_market_open": false,
+    "datetime": "2026-06-30"
+  },
+  "MSFT": {
+    "symbol": "MSFT",
+    "name": "Microsoft Corporation",
+    "exchange": "NASDAQ",
+    "currency": "USD",
+    "close": "512.10001",
+    "previous_close": "508.20001",
+    "change": "3.90000",
+    "percent_change": "0.76742",
+    "high": "514.00000",
+    "low": "506.11002",
+    "volume": "18220110",
+    "is_market_open": false,
+    "datetime": "2026-06-30"
+  },
+  "NOPE": {
+    "code": 404,
+    "message": "**symbol** not found: NOPE. Please specify a correct symbol.",
+    "status": "error"
+  }
+}

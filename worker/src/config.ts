@@ -3,6 +3,7 @@
 // once a working day, ONS inflation is monthly.
 export const TTL = {
   crypto: 60, // 1 minute
+  markets: 60, // 1 minute (equities quotes)
   fx: 12 * 60 * 60, // 12 hours
   macro: 24 * 60 * 60, // 24 hours
 } as const;
@@ -13,6 +14,7 @@ export const STALE_TTL = 7 * 24 * 60 * 60; // 7 days
 
 export const UPSTREAM = {
   coingecko: "https://api.coingecko.com/api/v3",
+  twelvedata: "https://api.twelvedata.com",
   frankfurter: "https://api.frankfurter.dev/v1",
   // ONS's dedicated API was retired 25/11/2024; the website serves the same
   // series as JSON when you append /data to a timeseries URL.

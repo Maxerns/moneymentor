@@ -5,11 +5,13 @@ import coingecko from "./fixtures/coingecko_markets.json";
 import frankfurter from "./fixtures/frankfurter_latest.json";
 import cpi from "./fixtures/ons_cpi.json";
 import cpih from "./fixtures/ons_cpih.json";
+import twelvedata from "./fixtures/twelvedata_quote_multi.json";
 import { FakeKV, makeFetch, SAMPLE_BOE_CSV, type StubResult } from "./helpers";
 
 // Route a stubbed upstream fetch to the right fixture by URL.
 function route(url: string): StubResult | Error {
   if (url.includes("coingecko")) return { body: coingecko };
+  if (url.includes("twelvedata")) return { body: twelvedata };
   if (url.includes("frankfurter")) return { body: frankfurter };
   if (url.includes("bankofengland")) return { body: SAMPLE_BOE_CSV };
   if (url.includes("/l55o/")) return { body: cpih };
@@ -19,6 +21,10 @@ function route(url: string): StubResult | Error {
 
 function envWithCache(): Env {
   return { CACHE: new FakeKV() } as unknown as Env;
+}
+
+function envWithKey(): Env {
+  return { CACHE: new FakeKV(), TWELVEDATA_API_KEY: "test-key" } as unknown as Env;
 }
 
 function get(path: string, env: Env, method = "GET") {
@@ -83,6 +89,27 @@ describe("worker routing", () => {
     expect(body.crypto).toHaveLength(2);
     expect(body.macro).toBeUndefined();
     expect(body.errors.map((e) => e.source)).toContain("macro");
+  });
+
+  it("GET /markets returns quotes when a key is configured", async () => {
+    vi.stubGlobal("fetch", makeFetch(route));
+    const res = await get("/markets", envWithKey());
+    expect(res.status).toBe(200);
+    expect((await res.json()) as unknown[]).toHaveLength(2); // AAPL, MSFT (NOPE skipped)
+  });
+
+  it("GET /dashboard includes markets when a key is configured", async () => {
+    vi.stubGlobal("fetch", makeFetch(route));
+    const res = await get("/dashboard", envWithKey());
+    const body = (await res.json()) as {
+      markets?: unknown[];
+      crypto?: unknown[];
+      errors: unknown[];
+    };
+    expect(res.status).toBe(200);
+    expect(body.markets).toHaveLength(2);
+    expect(body.crypto).toHaveLength(2);
+    expect(body.errors).toHaveLength(0);
   });
 
   it("OPTIONS returns 204 with CORS headers", async () => {

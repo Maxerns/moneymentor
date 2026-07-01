@@ -17,6 +17,22 @@ export interface CryptoAsset {
   updatedAt: string; // ISO 8601
 }
 
+export interface StockQuote {
+  symbol: string; // e.g. "AAPL"
+  name: string;
+  exchange: string | null;
+  currency: string; // e.g. "USD"
+  price: number; // latest close
+  previousClose: number | null;
+  change: number | null;
+  changePct: number | null;
+  high: number | null;
+  low: number | null;
+  volume: number | null;
+  isMarketOpen: boolean | null;
+  datetime: string; // e.g. "2026-06-30"
+}
+
 export interface FxSnapshot {
   base: string; // e.g. "GBP"
   date: string; // ECB reference date, YYYY-MM-DD
@@ -46,6 +62,7 @@ export interface SourceError {
 export interface DashboardResponse {
   generatedAt: string; // ISO 8601
   crypto?: CryptoAsset[];
+  markets?: StockQuote[];
   fx?: FxSnapshot;
   macro?: MacroIndicator[];
   errors: SourceError[]; // partial-failure reporting; empty when all sources ok
