@@ -1,4 +1,4 @@
-> 🛠️ **Engineering write-up:** see **[ARCHITECTURE.md](ARCHITECTURE.md)** — the Cloudflare edge API proxy, caching, live-data sourcing, and testing behind the revived app.
+> **Engineering write-up:** see **[ARCHITECTURE.md](ARCHITECTURE.md)** — the Cloudflare edge API proxy, caching, live-data sourcing, and testing behind the revived app.
 
 **What is MoneyMentor?**
 
