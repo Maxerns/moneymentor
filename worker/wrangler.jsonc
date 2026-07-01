@@ -1,0 +1,23 @@
+{
+  // MoneyMentor edge API. Deploy with `npm run deploy` (after `wrangler login`).
+  "name": "moneymentor-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-06-01",
+  "observability": { "enabled": true },
+
+  // KV is the response cache. Create it once with:
+  //   wrangler kv namespace create CACHE
+  // then paste the returned id below (and a preview_id for `wrangler dev`).
+  "kv_namespaces": [
+    {
+      "binding": "CACHE",
+      "id": "REPLACE_WITH_KV_NAMESPACE_ID",
+      "preview_id": "REPLACE_WITH_KV_PREVIEW_ID"
+    }
+  ]
+
+  // Keyed upstreams are added later as secrets (never committed):
+  //   wrangler secret put TWELVEDATA_API_KEY
+  //   wrangler secret put FRED_API_KEY
+  //   wrangler secret put NEWS_API_KEY
+}
