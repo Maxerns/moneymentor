@@ -28,6 +28,17 @@ interface Envelope<T> {
 
 const STALE_PREFIX = "stale:";
 
+// KV should only ever hold envelopes we wrote, but a corrupted or
+// partially-written value could be invalid JSON. Parse defensively so a bad
+// entry is treated as absent rather than throwing.
+function parseEnvelope<T>(raw: string): Envelope<T> | null {
+  try {
+    return JSON.parse(raw) as Envelope<T>;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Read-through cache with serve-stale-on-error.
  *
@@ -49,8 +60,12 @@ export async function getCached<T>(
 ): Promise<CacheResult<T>> {
   const fresh = await kv.get(key);
   if (fresh !== null) {
-    const envelope = JSON.parse(fresh) as Envelope<T>;
-    return { data: envelope.data, status: "HIT", storedAt: envelope.storedAt };
+    // A corrupted fresh entry falls through to the loader (a MISS) rather than
+    // surfacing a parse error to the caller.
+    const envelope = parseEnvelope<T>(fresh);
+    if (envelope !== null) {
+      return { data: envelope.data, status: "HIT", storedAt: envelope.storedAt };
+    }
   }
 
   try {
