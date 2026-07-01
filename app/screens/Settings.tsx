@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../.expo/types/types";
+import { RootStackParamList } from "../types/navigation";
 import { useTheme } from "../context/ThemeContext";
 import { deleteUser } from "firebase/auth";
 import { doc, deleteDoc } from "firebase/firestore";

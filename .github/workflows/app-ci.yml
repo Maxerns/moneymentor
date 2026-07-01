@@ -1,0 +1,32 @@
+name: App CI
+
+# Typecheck + test the Expo app. Ignores worker-only changes (the worker has its
+# own workflow).
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - "worker/**"
+  pull_request:
+    paths-ignore:
+      - "worker/**"
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit -p tsconfig.json
+
+      - name: Test
+        run: npx jest --ci --watchAll=false

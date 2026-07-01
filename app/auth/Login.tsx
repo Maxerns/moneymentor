@@ -13,7 +13,7 @@ import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../firebase/config";
-import { RootStackParamList } from "../../.expo/types/types";
+import { RootStackParamList } from "../types/navigation";
 import { useTheme } from "../context/ThemeContext";
 
 export default function Login() {
