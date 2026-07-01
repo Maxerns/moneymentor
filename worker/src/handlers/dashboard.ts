@@ -16,7 +16,11 @@ const DEFAULT_SYMBOLS = ["USD", "EUR", "JPY"];
 // the same cache the granular endpoints use, and a single failing upstream
 // becomes a partial response with an entry in `errors[]` rather than a 500.
 export async function handleDashboard(url: URL, env: Env): Promise<Response> {
-  const ids = parseList(url.searchParams.get("ids"), DEFAULT_IDS);
+  // Match /crypto: CoinGecko ids are case-sensitive and lowercase, so normalize
+  // to avoid upstream misses and casing-forked cache keys.
+  const ids = parseList(url.searchParams.get("ids"), DEFAULT_IDS).map((id) =>
+    id.toLowerCase(),
+  );
   const vs = (url.searchParams.get("vs") ?? DEFAULT_VS).toLowerCase();
   const base = (url.searchParams.get("base") ?? DEFAULT_BASE).toUpperCase();
   const symbols = parseList(url.searchParams.get("symbols"), DEFAULT_SYMBOLS).map(
