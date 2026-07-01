@@ -81,90 +81,27 @@ To enhance individuals’ ability to manage personal expenditure and increase fi
                                                          `Final App Captures`
   
   **Auth**
-  
-  <img width="206" height="474" alt="image" src="https://github.com/user-attachments/assets/632bacc6-5e22-4c68-940d-180483f196f9" />
-  <img width="206" height="477" alt="image" src="https://github.com/user-attachments/assets/89af517a-ece4-4e46-8245-a0c6b09c85f6" />
-  <img width="205" height="477" alt="image" src="https://github.com/user-attachments/assets/86143c79-0cb7-4daa-8b0a-ca2c3c8d2a00" />
-  <img width="206" height="478" alt="image" src="https://github.com/user-attachments/assets/cdb60d5d-9134-4374-98ea-00a4d9b223dc" />
-  <img width="207" height="481" alt="image" src="https://github.com/user-attachments/assets/006db3b3-be17-49fa-847d-b89a524d6e5d" />
-  <img width="207" height="480" alt="image" src="https://github.com/user-attachments/assets/3f10c07e-2ad8-4987-9d97-9b88996e71ef" />
-  <img width="207" height="482" alt="image" src="https://github.com/user-attachments/assets/ffe7ae8c-7a69-4c54-90ce-642d9be2eeff" />
+
+  <img src="docs/screenshots/10-landing.png" width="240" alt="Landing" />
+  <img src="docs/screenshots/08-login.png" width="240" alt="Login" />
+  <img src="docs/screenshots/09-signup.png" width="240" alt="Sign up" />
 
   **Dashboard Component**
-  
-  <img width="279" height="579" alt="image" src="https://github.com/user-attachments/assets/3c116b77-e2ac-4349-a2e1-ff1596295ae6" />
+
+  <img src="docs/screenshots/03-home.png" width="240" alt="Dashboard home" />
 
   **Profile & Settings**
-  
-  <img width="236" height="496" alt="image" src="https://github.com/user-attachments/assets/625356af-1d82-4770-815f-4e30d9638e21" />
-  <img width="233" height="499" alt="image" src="https://github.com/user-attachments/assets/f848ac3f-bfb8-4012-baa2-3206d94bb67c" />
-  <img width="238" height="498" alt="image" src="https://github.com/user-attachments/assets/dc7d22f3-b9ba-4012-bd6a-3f2bb3f9e606" />
-  <img width="231" height="485" alt="image" src="https://github.com/user-attachments/assets/7de8049c-2f27-4683-a110-a9d075c1b877" />
-  <img width="227" height="467" alt="image" src="https://github.com/user-attachments/assets/8ae5ef6f-c0f0-4209-ac8f-401f0cea76cf" />
-  <img width="227" height="463" alt="image" src="https://github.com/user-attachments/assets/679d88d4-e803-4445-ba32-49494782c13b" />
+
+  <img src="docs/screenshots/07-settings.png" width="240" alt="Settings" />
 
   **Education Modules**
-  
-  <img width="235" height="493" alt="image" src="https://github.com/user-attachments/assets/7447aa74-7abe-4cca-bcec-6001500a265b" />
-  <img width="239" height="506" alt="image" src="https://github.com/user-attachments/assets/d26ca616-2f5e-4911-8131-1e3163100861" />
-  <img width="225" height="502" alt="image" src="https://github.com/user-attachments/assets/ab1aa956-530d-46c0-be4e-1425fc8a791f" />
-  <img width="233" height="501" alt="image" src="https://github.com/user-attachments/assets/491fc78a-295f-47d0-9995-1ceb35f9e638" />
+
+  <img src="docs/screenshots/06-learning.png" width="240" alt="Learning modules" />
 
   **Financial Tools and Analytics**
-  
-  <img width="263" height="555" alt="image" src="https://github.com/user-attachments/assets/33607bdc-f452-4b3e-b5d2-8b83ec8c2a65" />
-  <img width="261" height="559" alt="image" src="https://github.com/user-attachments/assets/3ded126a-e08a-46a7-9115-8f1bcd5e1f01" />
-  <img width="261" height="552" alt="image" src="https://github.com/user-attachments/assets/22245da5-5bf3-454d-b134-08b19c12357f" />
-  <img width="267" height="560" alt="image" src="https://github.com/user-attachments/assets/dc5f4d93-8533-4e56-94ba-4ff8f853aa5a" />
-  <img width="268" height="563" alt="image" src="https://github.com/user-attachments/assets/43c216d6-0345-4c23-a185-ac6c2ccf1e8c" />
-  <img width="267" height="560" alt="image" src="https://github.com/user-attachments/assets/0f8d402b-abf5-4fcb-acec-102aca2fed4a" />
-  <img width="266" height="569" alt="image" src="https://github.com/user-attachments/assets/ca09d0e1-121d-4c6c-a0cc-5e0f7610aa49" />
-  <img width="273" height="572" alt="image" src="https://github.com/user-attachments/assets/bb4cee80-df25-4a4b-9375-b117d80a77b6" />
-  <img width="273" height="572" alt="image" src="https://github.com/user-attachments/assets/aabd5d90-de4a-41ba-bb96-be142daf2b54" />
-  <img width="273" height="575" alt="image" src="https://github.com/user-attachments/assets/433eabe3-46f5-4afd-843f-0d55f1e49786" />
-  <img width="269" height="571" alt="image" src="https://github.com/user-attachments/assets/58ce9c58-53ae-4cc4-b336-db87f3c947ae" />
-  <img width="276" height="582" alt="image" src="https://github.com/user-attachments/assets/043dbf11-98c5-4c10-8291-67bd2cb6f9d8" />
-  <img width="275" height="583" alt="image" src="https://github.com/user-attachments/assets/532f26fc-163f-46aa-bf8a-ad7c2754127c" />
-  <img width="278" height="586" alt="image" src="https://github.com/user-attachments/assets/290ff3e7-c30a-4231-95dd-053f003ef546" />
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-  
-
-
-
-
-
+  <img src="docs/screenshots/01-dashboard.png" width="240" alt="Markets dashboard — live data" />
+  <img src="docs/screenshots/02-tax-estimator.png" width="240" alt="Tax Estimator" />
+  <img src="docs/screenshots/04-tools.png" width="240" alt="Tools" />
+  <img src="docs/screenshots/05-glossary.png" width="240" alt="Financial Term Glossary" />
+  <img src="docs/screenshots/11-budget.png" width="240" alt="Budget Manager" />
