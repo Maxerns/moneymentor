@@ -282,7 +282,8 @@ export default function TaxEstimatorTool() {
         const income = parseFloat(incomeAmount) || 0;
         const deductionAmount = parseFloat(deductions) || 0;
 
-        // Progressive tax rate simulation (UK-like)
+        // Progressive UK income tax — England & Northern Ireland, 2025/26 tax year.
+        // (Scotland sets its own bands/rates; this simplified model doesn't cover them.)
         let taxableIncome = income - deductionAmount;
         let tax = 0;
 
@@ -293,38 +294,48 @@ export default function TaxEstimatorTool() {
         }
 
         if (taxableIncome > 0) {
-          // Personal allowance (first £12,570 tax-free)
-          const personalAllowance = 12570;
+          // Additional rate: 45% above £125,140 (this threshold replaced the old
+          // £150,000 one from April 2023)
+          const additionalRateThreshold = 125140;
 
-          // Basic rate: 20% on income between £12,571 to £50,270
-          const basicRateMax = 50270;
+          // Personal allowance is £12,570, but it tapers by £1 for every £2 of
+          // income over £100,000 — fully withdrawn at £125,140.
+          let personalAllowance = 12570;
+          if (taxableIncome > 100000) {
+            personalAllowance = Math.max(
+              0,
+              12570 - (taxableIncome - 100000) / 2
+            );
+          }
 
-          // Higher rate: 40% on income between £50,271 to £150,000
-          const higherRateMax = 150000;
-
-          // Additional rate: 45% on income over £150,000
+          // 20% basic-rate band = the first £37,700 of income above the personal
+          // allowance (£12,570 + £37,700 = the usual £50,270 ceiling). Measuring it
+          // relative to the allowance keeps it correct once the allowance tapers.
+          const basicRateCeiling = personalAllowance + 37700;
 
           // Account for tax credits if enabled
           if (taxCredits) {
             taxableIncome -= 1000; // Example tax credit amount
           }
 
-          // Calculate tax based on bands
+          // Calculate tax band by band
           if (taxableIncome > personalAllowance) {
-            // Basic rate
+            // Basic rate (20%)
             const basicRateAmount =
-              Math.min(taxableIncome, basicRateMax) - personalAllowance;
+              Math.min(taxableIncome, basicRateCeiling) - personalAllowance;
             tax += basicRateAmount > 0 ? basicRateAmount * 0.2 : 0;
 
-            // Higher rate
-            if (taxableIncome > basicRateMax) {
+            // Higher rate (40%)
+            if (taxableIncome > basicRateCeiling) {
               const higherRateAmount =
-                Math.min(taxableIncome, higherRateMax) - basicRateMax;
+                Math.min(taxableIncome, additionalRateThreshold) -
+                basicRateCeiling;
               tax += higherRateAmount > 0 ? higherRateAmount * 0.4 : 0;
 
-              // Additional rate
-              if (taxableIncome > higherRateMax) {
-                const additionalRateAmount = taxableIncome - higherRateMax;
+              // Additional rate (45%)
+              if (taxableIncome > additionalRateThreshold) {
+                const additionalRateAmount =
+                  taxableIncome - additionalRateThreshold;
                 tax += additionalRateAmount * 0.45;
               }
             }
