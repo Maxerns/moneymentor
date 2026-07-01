@@ -1,4 +1,4 @@
-# MoneyMentor
+> **Engineering write-up:** see **[ARCHITECTURE.md](ARCHITECTURE.md)** — the Cloudflare edge API proxy, caching, live-data sourcing, and testing behind the revived app.
 
 A mobile app that helps adults build financial literacy — a live markets dashboard, budgeting, a UK tax estimator, an interactive glossary, and guided learning modules.
 
