@@ -26,9 +26,11 @@ export class FakeKV implements KvLike {
   ): Promise<void> {
     this.puts++;
     const ttl = options?.expirationTtl;
+    // Only an absent TTL means "never expires"; a TTL of 0 must expire
+    // immediately, matching Workers KV rather than treating 0 as falsy.
     this.store.set(key, {
       value,
-      expiresAt: ttl ? this.now() + ttl * 1000 : null,
+      expiresAt: ttl !== undefined ? this.now() + ttl * 1000 : null,
     });
   }
 }
