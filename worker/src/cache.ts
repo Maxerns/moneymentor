@@ -80,12 +80,16 @@ export async function getCached<T>(
   } catch (err) {
     const stale = await kv.get(STALE_PREFIX + key);
     if (stale !== null) {
-      const envelope = JSON.parse(stale) as Envelope<T>;
-      return {
-        data: envelope.data,
-        status: "STALE",
-        storedAt: envelope.storedAt,
-      };
+      // Only serve stale if it's usable; a corrupted stale entry must not mask
+      // the original loader failure, so fall through and rethrow it.
+      const envelope = parseEnvelope<T>(stale);
+      if (envelope !== null) {
+        return {
+          data: envelope.data,
+          status: "STALE",
+          storedAt: envelope.storedAt,
+        };
+      }
     }
     throw err;
   }
