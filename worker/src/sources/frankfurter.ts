@@ -1,7 +1,7 @@
 import { UPSTREAM } from "../config";
 import { badGateway } from "../http";
 import type { FxSnapshot } from "../types";
-import type { Fetcher } from "./coingecko";
+import { defaultFetcher, type Fetcher } from "./coingecko";
 
 // Frankfurter's /latest payload: { amount, base, date, rates: { SYM: rate } }.
 interface FrankfurterLatest {
@@ -30,7 +30,7 @@ export function buildFrankfurterUrl(base: string, symbols: string[]): string {
 export async function fetchFx(
   base: string,
   symbols: string[],
-  fetcher: Fetcher = fetch,
+  fetcher: Fetcher = defaultFetcher,
 ): Promise<FxSnapshot> {
   const res = await fetcher(buildFrankfurterUrl(base, symbols));
   if (!res.ok) {

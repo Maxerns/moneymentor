@@ -27,3 +27,8 @@ export const UPSTREAM = {
 
 // Number of trailing months to include in a macro sparkline.
 export const MACRO_HISTORY_MONTHS = 24;
+
+// Some free upstreams (CoinGecko, ONS) reject requests that arrive without a
+// User-Agent — the Worker runtime sends none by default.
+export const USER_AGENT =
+  "MoneyMentor/1.0 (+https://github.com/Maxerns/moneymentor)";

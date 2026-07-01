@@ -1,9 +1,14 @@
-import { UPSTREAM } from "../config";
+import { UPSTREAM, USER_AGENT } from "../config";
 import { badGateway } from "../http";
 import type { CryptoAsset } from "../types";
 
 // A fetch-shaped function, injectable so sources are unit-testable without network.
 export type Fetcher = (url: string, init?: RequestInit) => Promise<Response>;
+
+// Default fetcher used by every source. Identifies the client, since several
+// free upstreams 403 a request that arrives without a User-Agent.
+export const defaultFetcher: Fetcher = (url, init) =>
+  fetch(url, { ...init, headers: { "User-Agent": USER_AGENT } });
 
 // Only the fields we consume from CoinGecko's /coins/markets rows.
 interface CoinGeckoMarket {
@@ -53,7 +58,7 @@ export function buildCoinGeckoUrl(ids: string[], currency: string): string {
 export async function fetchCrypto(
   ids: string[],
   currency: string,
-  fetcher: Fetcher = fetch,
+  fetcher: Fetcher = defaultFetcher,
 ): Promise<CryptoAsset[]> {
   const res = await fetcher(buildCoinGeckoUrl(ids, currency));
   if (!res.ok) {

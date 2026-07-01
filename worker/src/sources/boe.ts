@@ -1,7 +1,7 @@
 import { UPSTREAM } from "../config";
 import { badGateway } from "../http";
 import type { MacroIndicator, MacroPoint } from "../types";
-import type { Fetcher } from "./coingecko";
+import { defaultFetcher, type Fetcher } from "./coingecko";
 
 const BANK_RATE_SERIES = "IUDBEDR"; // BoE official Bank Rate (daily)
 
@@ -70,7 +70,7 @@ export function normalizeBoe(csv: string): MacroIndicator {
 }
 
 export async function fetchUkBaseRate(
-  fetcher: Fetcher = fetch,
+  fetcher: Fetcher = defaultFetcher,
 ): Promise<MacroIndicator> {
   const res = await fetcher(buildBoeUrl());
   if (!res.ok) {
