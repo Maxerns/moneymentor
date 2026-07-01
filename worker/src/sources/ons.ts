@@ -1,7 +1,7 @@
 import { MACRO_HISTORY_MONTHS, UPSTREAM } from "../config";
 import { badGateway } from "../http";
 import type { MacroIndicator, MacroPoint } from "../types";
-import type { Fetcher } from "./coingecko";
+import { defaultFetcher, type Fetcher } from "./coingecko";
 
 // The two UK inflation series we surface, both from ONS dataset MM23.
 const SERIES = [
@@ -65,7 +65,7 @@ async function fetchOnsSeries(
 }
 
 export async function fetchUkInflation(
-  fetcher: Fetcher = fetch,
+  fetcher: Fetcher = defaultFetcher,
 ): Promise<MacroIndicator[]> {
   return Promise.all(SERIES.map((series) => fetchOnsSeries(series, fetcher)));
 }

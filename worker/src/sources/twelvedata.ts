@@ -1,7 +1,7 @@
 import { UPSTREAM } from "../config";
 import { badGateway } from "../http";
 import type { StockQuote } from "../types";
-import type { Fetcher } from "./coingecko";
+import { defaultFetcher, type Fetcher } from "./coingecko";
 
 // TwelveData /quote fields we use. Numeric fields arrive as strings.
 interface TwelveDataQuote {
@@ -92,7 +92,7 @@ export function buildQuoteUrl(symbols: string[], apikey: string): string {
 export async function fetchMarkets(
   symbols: string[],
   apikey: string,
-  fetcher: Fetcher = fetch,
+  fetcher: Fetcher = defaultFetcher,
 ): Promise<StockQuote[]> {
   if (!apikey) {
     throw badGateway("TwelveData API key not configured");
