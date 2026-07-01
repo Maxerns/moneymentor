@@ -850,7 +850,7 @@ export default function BudgetManagementTool() {
               No transactions yet
             </Text>
           )}
-        </View>{" "}
+        </View>
       </ScrollView>
 
       {/* Add Transaction Modal */}
