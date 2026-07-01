@@ -20,7 +20,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth } from "../../firebase/config";
-import { RootStackParamList } from "../../.expo/types/types";
+import { RootStackParamList } from "../types/navigation";
 import { useTheme } from "../context/ThemeContext";
 
 export default function SignUp() {

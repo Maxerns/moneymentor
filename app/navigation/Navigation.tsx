@@ -1,7 +1,7 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
-import { RootStackParamList } from "../../.expo/types/types";
+import { RootStackParamList } from "../types/navigation";
 import Landing from "../screens/Landing";
 import SignUp from "../auth/SignUp";
 import Login from "../auth/Login";

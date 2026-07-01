@@ -21,7 +21,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../.expo/types/types";
+import { RootStackParamList } from "../types/navigation";
 import { useTheme } from "../context/ThemeContext";
 import { auth } from "@/firebase/config";
 

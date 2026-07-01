@@ -1,3 +1,5 @@
+> 🛠️ **Engineering write-up:** see **[ARCHITECTURE.md](ARCHITECTURE.md)** — the Cloudflare edge API proxy, caching, live-data sourcing, and testing behind the revived app.
+
 **What is MoneyMentor?**
 
 MoneyMentor is a mobile application designed to help adults improve their financial literacy and money management skills. It tackles the issue of poor financial knowledge among adults by providing practical tools, educational resources, and interactive features that encourage better budgeting, saving, and overall financial decision-making.

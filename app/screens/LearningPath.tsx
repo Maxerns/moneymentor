@@ -4,7 +4,7 @@ import { LearningPathSelector } from "../components/LearningPathSelector";
 import { learningService } from "../services/learningService";
 import { useTheme } from "../context/ThemeContext";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "@/.expo/types/types";
+import { RootStackParamList } from "../types/navigation";
 
 export default function LearningPath() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();

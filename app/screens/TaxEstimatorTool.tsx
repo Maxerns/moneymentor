@@ -16,8 +16,9 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../.expo/types/types";
+import { RootStackParamList } from "../types/navigation";
 import { useTheme } from "../context/ThemeContext";
+import { estimateIncomeTax } from "../utils/tax";
 
 export default function TaxEstimatorTool() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -282,65 +283,15 @@ export default function TaxEstimatorTool() {
         const income = parseFloat(incomeAmount) || 0;
         const deductionAmount = parseFloat(deductions) || 0;
 
-        // Progressive UK income tax — England & Northern Ireland, 2025/26 tax year.
-        // (Scotland sets its own bands/rates; this simplified model doesn't cover them.)
-        let taxableIncome = income - deductionAmount;
-        let tax = 0;
-
-        // Apply additional adjustment based on employment type
-        if (incomeType === "Freelancer" || incomeType === "Self-employed") {
-          // Self-employed people might have different tax rules, like National Insurance
-          taxableIncome = taxableIncome * 0.95; // Example adjustment
-        }
-
-        if (taxableIncome > 0) {
-          // Additional rate: 45% above £125,140 (this threshold replaced the old
-          // £150,000 one from April 2023)
-          const additionalRateThreshold = 125140;
-
-          // Personal allowance is £12,570, but it tapers by £1 for every £2 of
-          // income over £100,000 — fully withdrawn at £125,140.
-          let personalAllowance = 12570;
-          if (taxableIncome > 100000) {
-            personalAllowance = Math.max(
-              0,
-              12570 - (taxableIncome - 100000) / 2
-            );
-          }
-
-          // 20% basic-rate band = the first £37,700 of income above the personal
-          // allowance (£12,570 + £37,700 = the usual £50,270 ceiling). Measuring it
-          // relative to the allowance keeps it correct once the allowance tapers.
-          const basicRateCeiling = personalAllowance + 37700;
-
-          // Account for tax credits if enabled
-          if (taxCredits) {
-            taxableIncome -= 1000; // Example tax credit amount
-          }
-
-          // Calculate tax band by band
-          if (taxableIncome > personalAllowance) {
-            // Basic rate (20%)
-            const basicRateAmount =
-              Math.min(taxableIncome, basicRateCeiling) - personalAllowance;
-            tax += basicRateAmount > 0 ? basicRateAmount * 0.2 : 0;
-
-            // Higher rate (40%)
-            if (taxableIncome > basicRateCeiling) {
-              const higherRateAmount =
-                Math.min(taxableIncome, additionalRateThreshold) -
-                basicRateCeiling;
-              tax += higherRateAmount > 0 ? higherRateAmount * 0.4 : 0;
-
-              // Additional rate (45%)
-              if (taxableIncome > additionalRateThreshold) {
-                const additionalRateAmount =
-                  taxableIncome - additionalRateThreshold;
-                tax += additionalRateAmount * 0.45;
-              }
-            }
-          }
-        }
+        // UK income tax (England & NI, 2025/26). Band logic lives in
+        // app/utils/tax.ts so it can be unit-tested.
+        const tax = estimateIncomeTax({
+          income,
+          deductions: deductionAmount,
+          selfEmployed:
+            incomeType === "Freelancer" || incomeType === "Self-employed",
+          taxCredits,
+        });
 
         setResult(tax > 0 ? tax : 0);
         setIsCalculating(false);
