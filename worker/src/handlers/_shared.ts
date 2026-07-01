@@ -18,6 +18,7 @@ export function parseList(value: string | null, fallback: string[]): string[] {
 export const cacheKeys = {
   crypto: (vs: string, ids: string[]) =>
     `v1:crypto:${vs}:${[...ids].sort().join(",")}`,
+  markets: (symbols: string[]) => `v1:markets:${[...symbols].sort().join(",")}`,
   fx: (base: string, symbols: string[]) =>
     `v1:fx:${base}:${[...symbols].sort().join(",")}`,
   macroUk: () => "v1:macro:uk",

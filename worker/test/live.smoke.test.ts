@@ -3,6 +3,7 @@ import { fetchUkBaseRate } from "../src/sources/boe";
 import { fetchCrypto } from "../src/sources/coingecko";
 import { fetchFx } from "../src/sources/frankfurter";
 import { fetchUkInflation } from "../src/sources/ons";
+import { fetchMarkets } from "../src/sources/twelvedata";
 
 // Real network calls against the keyless upstreams. Skipped unless LIVE=1 so the
 // default suite stays offline and deterministic. Run with: `LIVE=1 npm test`.
@@ -35,4 +36,18 @@ describe.runIf(live)("live smoke (LIVE=1)", () => {
     expect(rate.latest.value).toBeGreaterThan(0);
     expect(rate.history.length).toBeGreaterThan(1); // multiple rate steps
   }, 20000);
+
+  // Needs a real key exported: LIVE=1 TWELVEDATA_API_KEY=... npm test
+  it.runIf(process.env.TWELVEDATA_API_KEY)(
+    "TwelveData returns equity quotes (batch)",
+    async () => {
+      const quotes = await fetchMarkets(
+        ["AAPL", "MSFT"],
+        process.env.TWELVEDATA_API_KEY as string,
+      );
+      expect(quotes.length).toBeGreaterThan(0);
+      expect(quotes[0].price).toBeGreaterThan(0);
+    },
+    15000,
+  );
 });

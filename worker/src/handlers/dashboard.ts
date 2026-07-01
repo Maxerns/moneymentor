@@ -1,23 +1,33 @@
-import { getCached } from "../cache";
+import { type CacheResult, getCached } from "../cache";
 import { TTL } from "../config";
 import { json } from "../http";
 import { fetchCrypto } from "../sources/coingecko";
 import { fetchFx } from "../sources/frankfurter";
+import { fetchMarkets } from "../sources/twelvedata";
 import { fetchUkMacro } from "../sources/ukMacro";
 import type { DashboardResponse, Env, SourceError } from "../types";
 import { cacheKeys, parseList } from "./_shared";
 
 const DEFAULT_IDS = ["bitcoin", "ethereum"];
 const DEFAULT_VS = "gbp";
+const DEFAULT_STOCKS = ["AAPL", "MSFT"];
 const DEFAULT_BASE = "GBP";
 const DEFAULT_SYMBOLS = ["USD", "EUR", "JPY"];
+
+// One source's slot in the fan-out: its label, the cached promise, and how its
+// data lands on the response body. Keeping them together lets us build the job
+// list dynamically (e.g. only include markets when a key is configured).
+interface Job {
+  source: SourceError["source"];
+  promise: Promise<CacheResult<unknown>>;
+  assign: (body: DashboardResponse, data: unknown) => void;
+}
 
 // GET /dashboard — one call that composes every source. Each is fetched through
 // the same cache the granular endpoints use, and a single failing upstream
 // becomes a partial response with an entry in `errors[]` rather than a 500.
 export async function handleDashboard(url: URL, env: Env): Promise<Response> {
-  // Match /crypto: CoinGecko ids are case-sensitive and lowercase, so normalize
-  // to avoid upstream misses and casing-forked cache keys.
+  // CoinGecko ids are case-sensitive/lowercase; FX + stock symbols upper-case.
   const ids = parseList(url.searchParams.get("ids"), DEFAULT_IDS).map((id) =>
     id.toLowerCase(),
   );
@@ -26,34 +36,67 @@ export async function handleDashboard(url: URL, env: Env): Promise<Response> {
   const symbols = parseList(url.searchParams.get("symbols"), DEFAULT_SYMBOLS).map(
     (s) => s.toUpperCase(),
   );
+  const stocks = parseList(url.searchParams.get("stocks"), DEFAULT_STOCKS).map(
+    (s) => s.toUpperCase(),
+  );
 
-  const [crypto, fx, macro] = await Promise.allSettled([
-    getCached(env.CACHE, cacheKeys.crypto(vs, ids), TTL.crypto, () =>
-      fetchCrypto(ids, vs),
-    ),
-    getCached(env.CACHE, cacheKeys.fx(base, symbols), TTL.fx, () =>
-      fetchFx(base, symbols),
-    ),
-    getCached(env.CACHE, cacheKeys.macroUk(), TTL.macro, () => fetchUkMacro()),
-  ]);
+  const jobs: Job[] = [
+    {
+      source: "crypto",
+      promise: getCached(env.CACHE, cacheKeys.crypto(vs, ids), TTL.crypto, () =>
+        fetchCrypto(ids, vs),
+      ),
+      assign: (body, data) => {
+        body.crypto = data as DashboardResponse["crypto"];
+      },
+    },
+    {
+      source: "fx",
+      promise: getCached(env.CACHE, cacheKeys.fx(base, symbols), TTL.fx, () =>
+        fetchFx(base, symbols),
+      ),
+      assign: (body, data) => {
+        body.fx = data as DashboardResponse["fx"];
+      },
+    },
+    {
+      source: "macro",
+      promise: getCached(env.CACHE, cacheKeys.macroUk(), TTL.macro, () =>
+        fetchUkMacro(),
+      ),
+      assign: (body, data) => {
+        body.macro = data as DashboardResponse["macro"];
+      },
+    },
+  ];
+
+  // Markets only joins the fan-out when the TwelveData key is configured.
+  if (env.TWELVEDATA_API_KEY) {
+    const apiKey = env.TWELVEDATA_API_KEY;
+    jobs.push({
+      source: "markets",
+      promise: getCached(env.CACHE, cacheKeys.markets(stocks), TTL.markets, () =>
+        fetchMarkets(stocks, apiKey),
+      ),
+      assign: (body, data) => {
+        body.markets = data as DashboardResponse["markets"];
+      },
+    });
+  }
+
+  const settled = await Promise.allSettled(jobs.map((job) => job.promise));
 
   const errors: SourceError[] = [];
-  const body: DashboardResponse = {
-    generatedAt: new Date().toISOString(),
-    errors,
-  };
+  const body: DashboardResponse = { generatedAt: new Date().toISOString(), errors };
 
-  if (crypto.status === "fulfilled") body.crypto = crypto.value.data;
-  else errors.push({ source: "crypto", message: messageOf(crypto.reason) });
-
-  if (fx.status === "fulfilled") body.fx = fx.value.data;
-  else errors.push({ source: "fx", message: messageOf(fx.reason) });
-
-  if (macro.status === "fulfilled") body.macro = macro.value.data;
-  else errors.push({ source: "macro", message: messageOf(macro.reason) });
+  settled.forEach((result, i) => {
+    const { source, assign } = jobs[i];
+    if (result.status === "fulfilled") assign(body, result.value.data);
+    else errors.push({ source, message: messageOf(result.reason) });
+  });
 
   // 200 as long as *something* came back; 502 only if every source failed.
-  const anyOk = Boolean(body.crypto || body.fx || body.macro);
+  const anyOk = errors.length < jobs.length;
   return json(body, { status: anyOk ? 200 : 502 });
 }
 

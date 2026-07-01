@@ -2,6 +2,7 @@ import { handleCrypto } from "./handlers/crypto";
 import { handleDashboard } from "./handlers/dashboard";
 import { handleFx } from "./handlers/fx";
 import { handleMacroUk } from "./handlers/macro";
+import { handleMarkets } from "./handlers/markets";
 import {
   corsPreflight,
   errorResponse,
@@ -24,15 +25,22 @@ const routes: Record<string, Handler> = {
   "/": async () =>
     json({
       service: "moneymentor-api",
-      endpoints: ["/health", "/crypto", "/fx", "/macro/uk", "/dashboard"],
+      endpoints: [
+        "/health",
+        "/crypto",
+        "/markets",
+        "/fx",
+        "/macro/uk",
+        "/dashboard",
+      ],
     }),
   "/health": async () => json({ ok: true, ts: new Date().toISOString() }),
   "/crypto": handleCrypto,
+  "/markets": handleMarkets, // 501 until TWELVEDATA_API_KEY is set
   "/fx": handleFx,
   "/macro/uk": handleMacroUk,
   "/dashboard": handleDashboard,
   // Roadmap — keyed upstreams awaiting `wrangler secret put`:
-  "/markets": notImplemented("markets (TwelveData)"),
   "/macro/us": notImplemented("US macro (FRED)"),
   "/news": notImplemented("news"),
 };
