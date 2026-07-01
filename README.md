@@ -1,107 +1,102 @@
 > **Engineering write-up:** see **[ARCHITECTURE.md](ARCHITECTURE.md)** — the Cloudflare edge API proxy, caching, live-data sourcing, and testing behind the revived app.
 
-**What is MoneyMentor?**
+A mobile app that helps adults build financial literacy — a live markets dashboard, budgeting, a UK tax estimator, an interactive glossary, and guided learning modules.
 
-MoneyMentor is a mobile application designed to help adults improve their financial literacy and money management skills. It tackles the issue of poor financial knowledge among adults by providing practical tools, educational resources, and interactive features that encourage better budgeting, saving, and overall financial decision-making.
+**Engineering deep-dive → [ARCHITECTURE.md](ARCHITECTURE.md)** — the Cloudflare edge API proxy, caching, live-data sourcing, and testing behind the revived app.
 
-**What it Encapsulates**
+---
 
-MoneyMentor brings together:
+## Overview
 
-- Financial Education – simplifying complex financial terms and concepts into understandable and accessible content.
+MoneyMentor helps adults improve their financial literacy and money-management skills. It tackles poor financial knowledge with practical tools, educational resources, and interactive features that encourage better budgeting, saving, and decision-making.
 
-- Budgeting Tools – enabling users to track spending, set financial goals, and manage budgets effectively.
+**What it brings together**
 
-- Interactive Learning – quizzes, calculators, and visual charts to make learning about money engaging and practical.
+- **Financial education** — complex terms and concepts simplified into accessible content.
+- **Budgeting tools** — track spending, set goals, and manage budgets.
+- **Interactive learning** — quizzes, calculators, and charts that make money engaging.
+- **Personal guidance** — reminders, tips, and progress tracking.
+- **User-centric design** — simple and engaging across all levels of financial knowledge.
 
-- Personal Guidance – reminders, tips, and progress tracking to encourage continuous improvement.
+## Aim
 
-- User-Centric Design – an interface that is simple, engaging, and tailored to adults with varying levels of financial knowledge.
+To improve individuals' ability to manage personal expenditure and increase financial literacy among adults — helping them make informed decisions, build healthier money habits, and reduce financial stress.
 
-**Aim**
+## Objectives
 
-To enhance individuals’ ability to manage personal expenditure and increase financial literacy among adults, ultimately helping them make informed financial decisions, develop healthier money habits, and reduce financial stress.
+- Identify knowledge gaps in financial literacy through questionnaires and research.
+- Design a mobile app with accessible, engaging financial-learning tools.
+- Incorporate interactive features — goal tracking, calculators, quizzes, and progress visualisations.
+- Promote positive financial behaviours with budgeting templates, reminders, and tips.
+- Test usability and effectiveness with real users.
+- Encourage long-term engagement through appealing, adaptable design.
 
-**Objectives**
+## Screens
 
-- Identify knowledge gaps in financial literacy among adults through questionnaires and research.
+_Captured on iOS (iPhone 16 Pro), with live data served through the edge proxy._
 
-- Design and develop a mobile application that provides accessible and engaging financial learning tools.
+**Auth**
 
-- Incorporate interactive features (such as goal tracking, calculators, quizzes, and progress visualisations) to support practical learning.
+<img src="docs/screenshots/10-landing.png" width="230" alt="Landing" />
+<img src="docs/screenshots/08-login.png" width="230" alt="Login" />
+<img src="docs/screenshots/09-signup.png" width="230" alt="Sign up" />
 
-- Promote positive financial behaviours by offering budgeting templates, reminders, and tips for saving and spending.
+**Dashboard, tools & settings**
 
-- Test usability and effectiveness of the app with real users to evaluate whether it improves financial awareness and decision-making.
+<img src="docs/screenshots/03-home.png" width="230" alt="Home dashboard" />
+<img src="docs/screenshots/04-tools.png" width="230" alt="Tools" />
+<img src="docs/screenshots/07-settings.png" width="230" alt="Settings" />
 
-- Encourage long-term engagement by making the app visually appealing, user-friendly, and adaptable to different learning preferences.
+**Markets, tax & budgeting**
 
-                                                          `Use Case Diagram`
-  <img width="1065" height="770" alt="image" src="https://github.com/user-attachments/assets/ba347278-47e1-4a0e-82b3-927a9ad7e494" />
+<img src="docs/screenshots/01-dashboard.png" width="230" alt="Markets dashboard with live data" />
+<img src="docs/screenshots/02-tax-estimator.png" width="230" alt="Tax Estimator" />
+<img src="docs/screenshots/11-budget.png" width="230" alt="Budget Manager" />
 
-                                                           `User Persona Diagram 1`
-  <img width="728" height="526" alt="image" src="https://github.com/user-attachments/assets/e8f06832-6b0d-4ae3-bba7-b14eb41408d3" />
+**Learning & glossary**
 
-                                                           `User Persona Diagram 2`
-  <img width="940" height="743" alt="image" src="https://github.com/user-attachments/assets/9fbad36b-58b4-483c-8ffd-303d9b33f8ae" />
+<img src="docs/screenshots/06-learning.png" width="230" alt="Learning modules" />
+<img src="docs/screenshots/05-glossary.png" width="230" alt="Financial Term Glossary" />
 
-                                                           `User Journey Diagram 1`
-  <img width="940" height="393" alt="image" src="https://github.com/user-attachments/assets/311afb06-cf2c-44aa-b568-65ea2427a5cf" />
+## Design & research
 
-                                                           `User Journey Diagram 2`
-  <img width="940" height="393" alt="image" src="https://github.com/user-attachments/assets/da2bc4c9-c33c-45f1-8fac-81e5ef7228b2" />
+<details>
+<summary><b>UML, personas, user journeys & prototypes</b> — click to expand</summary>
 
-                                                           `Activity Diagram 1`
-  <img width="649" height="563" alt="image" src="https://github.com/user-attachments/assets/8b28b216-12b9-4943-b07a-92b08cabcdaa" />
+### Use case diagram
 
-                                                           `Activity Diagram 2`
-  <img width="467" height="567" alt="image" src="https://github.com/user-attachments/assets/15e92a78-a70a-453b-a938-847bf18b2f0f" />
+<img width="900" alt="Use case diagram" src="https://github.com/user-attachments/assets/ba347278-47e1-4a0e-82b3-927a9ad7e494" />
 
-                                                           Low Fidelity Prototypes
+### User personas
 
-                                                     `Financial Term Glossary Wireflow`
-  <img width="940" height="506" alt="image" src="https://github.com/user-attachments/assets/d9ca0016-9845-4e75-b9c2-3318ebbb8557" />
+<img width="700" alt="User persona 1" src="https://github.com/user-attachments/assets/e8f06832-6b0d-4ae3-bba7-b14eb41408d3" />
+<img width="700" alt="User persona 2" src="https://github.com/user-attachments/assets/9fbad36b-58b4-483c-8ffd-303d9b33f8ae" />
 
-                                                      `Tax Estimator Tool Wireflow`
-  <img width="940" height="297" alt="image" src="https://github.com/user-attachments/assets/f917b596-40fe-4407-96fa-438e3576639a" />
+### User journeys
 
+<img width="900" alt="User journey 1" src="https://github.com/user-attachments/assets/311afb06-cf2c-44aa-b568-65ea2427a5cf" />
+<img width="900" alt="User journey 2" src="https://github.com/user-attachments/assets/da2bc4c9-c33c-45f1-8fac-81e5ef7228b2" />
 
-                                                        High Fidelity Prototypes
-                                                   `Financial Term Glossary Workflow`
-  <img width="940" height="269" alt="image" src="https://github.com/user-attachments/assets/04ff635e-1338-4cb0-81a0-265f8534e327" />
+### Activity diagrams
 
+<img width="640" alt="Activity diagram 1" src="https://github.com/user-attachments/assets/8b28b216-12b9-4943-b07a-92b08cabcdaa" />
+<img width="640" alt="Activity diagram 2" src="https://github.com/user-attachments/assets/15e92a78-a70a-453b-a938-847bf18b2f0f" />
 
-                                                     `Tax Estimator Tool Workflow`
-  <img width="940" height="288" alt="image" src="https://github.com/user-attachments/assets/03cabf8c-b533-4422-9cb0-5f5910a7ad98" />
+### Low-fidelity prototypes
 
-                                                      `Prototype Overview (Figma)`
-  <img width="940" height="576" alt="image" src="https://github.com/user-attachments/assets/ac8b26d3-6eb2-4aa5-8bcf-370359635909" />
+<img width="900" alt="Glossary wireflow" src="https://github.com/user-attachments/assets/d9ca0016-9845-4e75-b9c2-3318ebbb8557" />
+<img width="900" alt="Tax estimator wireflow" src="https://github.com/user-attachments/assets/f917b596-40fe-4407-96fa-438e3576639a" />
 
+### High-fidelity prototypes
 
-                                                         `Final App Captures`
-  
-  **Auth**
+<img width="900" alt="Glossary workflow" src="https://github.com/user-attachments/assets/04ff635e-1338-4cb0-81a0-265f8534e327" />
+<img width="900" alt="Tax estimator workflow" src="https://github.com/user-attachments/assets/03cabf8c-b533-4422-9cb0-5f5910a7ad98" />
+<img width="900" alt="Figma prototype overview" src="https://github.com/user-attachments/assets/ac8b26d3-6eb2-4aa5-8bcf-370359635909" />
 
-  <img src="docs/screenshots/10-landing.png" width="240" alt="Landing" />
-  <img src="docs/screenshots/08-login.png" width="240" alt="Login" />
-  <img src="docs/screenshots/09-signup.png" width="240" alt="Sign up" />
+</details>
 
-  **Dashboard Component**
+## Tech
 
-  <img src="docs/screenshots/03-home.png" width="240" alt="Dashboard home" />
+React Native (Expo SDK 52) · TypeScript · Firebase Auth + Firestore · Cloudflare Workers + KV.
 
-  **Profile & Settings**
-
-  <img src="docs/screenshots/07-settings.png" width="240" alt="Settings" />
-
-  **Education Modules**
-
-  <img src="docs/screenshots/06-learning.png" width="240" alt="Learning modules" />
-
-  **Financial Tools and Analytics**
-
-  <img src="docs/screenshots/01-dashboard.png" width="240" alt="Markets dashboard — live data" />
-  <img src="docs/screenshots/02-tax-estimator.png" width="240" alt="Tax Estimator" />
-  <img src="docs/screenshots/04-tools.png" width="240" alt="Tools" />
-  <img src="docs/screenshots/05-glossary.png" width="240" alt="Financial Term Glossary" />
-  <img src="docs/screenshots/11-budget.png" width="240" alt="Budget Manager" />
+See **[ARCHITECTURE.md](ARCHITECTURE.md)** for the full engineering write-up and how to run it locally.
